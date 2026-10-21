@@ -1,1 +1,702 @@
-
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOSHEI SHMOT | Одежда из другого времени</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+koshei: { red: '#E51A1A', dark: '#050505', gray: '#111111' }
+},
+fontFamily: {
+'impact': ['Oswald', 'sans-serif'],
+'mono': ['"Roboto Mono"', 'monospace'],
+}
+}
+}
+}
+</script>
+<style>
+body { font-family: 'Roboto Mono', monospace; background-color: #050505; color: #d1d5db; }
+.dotted-box { border: 1px dashed #333; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #222; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+.tech-text { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #666; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.fade-in { animation: fadeIn 0.4s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body class="bg-koshei-dark text-gray-300 min-h-screen transition-colors duration-300 flex flex-col justify-between">
+<script>
+let JSONBIN_BIN_ID = localStorage.getItem('koshei_main_bin_id') || "6ad4d653ac6210605a3c4912";
+let JSONBIN_ACCESS_KEY = localStorage.getItem('koshei_main_access_key') || "2a10$HHmF6ZgWCnPVqG9Ggxp/EOBYkZiG5pocHmYToVmlv/I66cdgwqaQy";
+window.state = {
+products: [], films: [], looks: [], pendingLooks: [], cart: [],
+promoCode: '', promoDiscount: 0, telegramUsername: "KOSHEI_SUPPORT",
+searchQuery: "", currentFilmSlide: 0, activeProductId: null, promos: {}
+};
+let filmInterval = null;
+function getDefaultFilms() {
+return [
+{ id: 'bumer', tag: 'BMR', title: 'БУМЕР', desc: 'Чёрный BMW, ночная трасса, свобода.', quote: '«Не мы такие — жизнь такая.»', author: 'ПЁТР БУСЛОВ — 2003', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BUMER&font=Oswald' },
+{ id: 'bumer2', tag: 'BM2', title: 'БУМЕР 2', desc: 'Дорога, степи, вторая попытка начать с чистого листа.', quote: '«Пока мы живы — всё может измениться.»', author: 'ПЁТР БУСЛОВ — 2006', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BUMER+2&font=Oswald' },
+{ id: 'brat', tag: 'BRT', title: 'БРАТ', desc: 'Питер, дожди, кассета Nautilus, трамваи.', quote: '«В чём сила, брат? А я вот думаю, что сила в правде.»', author: 'АЛЕКСЕЙ БАЛАБАНОВ / СТВ — 1997', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BRAT&font=Oswald' },
+{ id: 'brat2', tag: 'BR2', title: 'БРАТ 2', desc: 'Москва — Чикаго, американская мечта по-русски.', quote: '«Вы мне ещё за Севастополь ответите!»', author: 'АЛЕКСЕЙ БАЛАБАНОВ / СТВ — 2000', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BRAT+2&font=Oswald' },
+{ id: 'zhmurki', tag: 'ZHM', title: 'ЖМУРКИ', desc: 'Лихие девяностые, малиновые пиджаки, чемодан с баксами.', quote: '«Карачун тебе, Церетели!»', author: 'АЛЕКСЕЙ БАЛАБАНОВ / СТВ — 2005', img: 'https://placehold.co/1200x600/050505/E51A1A?text=ZHMURKI&font=Oswald' },
+{ id: 'sestry', tag: 'SST', title: 'СЁСТРЫ', desc: 'Культовая драма. Цой в наушниках, прицел снайпера.', quote: '«Ты бы не наглей, малявка.»', author: 'СЕРГЕЙ БОДРОВ МЛ. / СТВ — 2001', img: 'https://placehold.co/1200x600/050505/E51A1A?text=SESTRY&font=Oswald' }
+];
+}
+async function loadCloudData() {
+try {
+const res = await fetch(⁠https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest⁠, {
+method: 'GET',
+headers: {
+'X-Master-Key': JSONBIN_ACCESS_KEY,
+'X-Access-Key': JSONBIN_ACCESS_KEY
+}
+});
+if(res.ok) {
+const json = await res.json();
+const data = json.record || {};
+window.state.products = data.products || [];
+window.state.films = (data.films && data.films.length > 0) ? data.films : getDefaultFilms();
+window.state.promos = data.promos || {};
+window.state.looks = data.looks || [];
+window.state.pendingLooks = data.pendingLooks || [];
+} else {
+initFallback();
+}
+} catch(e) {
+initFallback();
+}
+renderAll();
+}
+function initFallback() {
+window.state.products = [];
+window.state.films = getDefaultFilms();
+window.state.promos = {};
+window.state.looks = [];
+window.state.pendingLooks = [];
+}
+function renderAll() {
+renderProducts();
+renderFilmSlide();
+renderCartUI();
+renderLooks();
+setupSwipeListeners();
+resetAutoPlay();
+checkKeysConfiguredState();
+}
+function checkKeysConfiguredState() {
+const configured = localStorage.getItem('koshei_keys_configured');
+const wrap = document.getElementById('secret-keys-menu-btn-wrap');
+if (configured === 'true' && wrap) {
+wrap.style.display = 'none';
+}
+}
+window.openMenu = () => { const m = document.getElementById('menu-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
+window.closeMenu = () => { const m = document.getElementById('menu-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openCart = () => { const modal = document.getElementById('cart-modal'); if(modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderCartContents(); } };
+window.closeCart = () => { const modal = document.getElementById('cart-modal'); if(modal) { modal.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openMusicModal = () => { window.closeMenu(); const m = document.getElementById('music-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
+window.closeMusicModal = () => { const m = document.getElementById('music-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openArchiveModal = () => { window.closeMenu(); const m = document.getElementById('archive-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
+window.closeArchiveModal = () => { const m = document.getElementById('archive-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openLooksGalleryModal = () => { window.closeMenu(); const m = document.getElementById('looks-gallery-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderLooks(); } };
+window.closeLooksGalleryModal = () => { const m = document.getElementById('looks-gallery-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openLookModal = () => { window.closeMenu(); const m = document.getElementById('look-submit-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
+window.closeLookModal = () => { window.closeMenu(); const m = document.getElementById('look-submit-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openInfoModal = () => { window.closeMenu(); const modal = document.getElementById('info-modal'); if(modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
+window.closeInfoModal = () => { const modal = document.getElementById('info-modal'); if(modal) { modal.classList.add('hidden'); document.body.style.overflow = ''; } };
+window.openSizeGuide = () => { const modal = document.getElementById('size-guide-modal'); if(modal) modal.classList.remove('hidden'); };
+window.closeSizeGuide = () => { const modal = document.getElementById('size-guide-modal'); if(modal) modal.classList.add('hidden'); };
+window.checkSecretPin = () => {
+const val = document.getElementById('secret-pin-input').value.trim();
+if(val === '9812') {
+document.getElementById('pin-entry-box').classList.add('hidden');
+document.getElementById('keys-entry-box').classList.remove('hidden');
+document.getElementById('settings-bin-id').value = JSONBIN_BIN_ID;
+document.getElementById('settings-access-key').value = JSONBIN_ACCESS_KEY;
+} else {
+alert("Неверный код доступа!");
+}
+};
+window.saveSecretKeys = () => {
+const bId = document.getElementById('settings-bin-id').value.trim();
+const aKey = document.getElementById('settings-access-key').value.trim();
+if(bId && aKey) {
+localStorage.setItem('koshei_main_bin_id', bId);
+localStorage.setItem('koshei_main_access_key', aKey);
+localStorage.setItem('koshei_keys_configured', 'true');
+JSONBIN_BIN_ID = bId;
+JSONBIN_ACCESS_KEY = aKey;
+alert("Настройки сети успешно сохранены!");
+window.closeSecretKeysModal();
+checkKeysConfiguredState();
+loadCloudData();
+} else {
+alert("Заполните оба поля!");
+}
+};
+window.openSecretKeysModal = () => {
+window.closeMenu();
+const m = document.getElementById('secret-keys-modal');
+if(m) {
+m.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+document.getElementById('pin-entry-box').classList.remove('hidden');
+document.getElementById('keys-entry-box').classList.add('hidden');
+document.getElementById('secret-pin-input').value = '';
+}
+};
+window.closeSecretKeysModal = () => {
+const m = document.getElementById('secret-keys-modal');
+if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
+};
+window.handleSearch = (e) => { window.state.searchQuery = e.target.value.toLowerCase(); renderProducts(); }
+window.nextFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide + 1) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
+window.prevFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide - 1 + window.state.films.length) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
+function resetAutoPlay() {
+if (filmInterval) clearInterval(filmInterval);
+filmInterval = setInterval(() => { window.nextFilm(); }, 5000);
+}
+function setupSwipeListeners() {
+const filmArea = document.getElementById('film-strip-area');
+if (!filmArea) return;
+let touchstartX = 0; let touchendX = 0;
+filmArea.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+filmArea.addEventListener('touchend', e => {
+touchendX = e.changedTouches[0].screenX;
+if (touchendX < touchstartX - 40) window.nextFilm();
+if (touchendX > touchstartX + 40) window.prevFilm();
+}, {passive: true});
+}
+function renderFilmSlide() {
+if(!window.state.films || window.state.films.length === 0) return;
+const film = window.state.films[window.state.currentFilmSlide];
+const count = ⁠${String(window.state.currentFilmSlide + 1).padStart(2, '0')} / ${String(window.state.films.length).padStart(2, '0')}⁠;
+const els = {
+img: document.getElementById('hero-film-img'), counter1: document.getElementById('hero-film-counter'),
+year: document.getElementById('hero-film-year'), titleOver: document.getElementById('hero-film-title-overlay'),
+tag: document.getElementById('strip-tag'), title: document.getElementById('strip-title'),
+desc: document.getElementById('strip-desc'), quote: document.getElementById('strip-quote'),
+author: document.getElementById('strip-author'), counter2: document.getElementById('strip-counter')
+};
+if(els.img) els.img.src = film.img || ⁠https://placehold.co/1200x600/050505/111?text=KOSHEI⁠;
+if(els.counter1) els.counter1.innerText = ⁠КАДР ${count}⁠;
+if(els.year) els.year.innerText = ⁠ПАМЯТИ КИНО — ${film.author.split('—')[1]?.trim() || '90-Е'}⁠;
+if(els.titleOver) { els.titleOver.innerText = film.title; els.titleOver.classList.remove('fade-in'); void els.titleOver.offsetWidth; els.titleOver.classList.add('fade-in'); }
+if(els.tag) els.tag.innerText = film.tag || 'KSH';
+if(els.title) els.title.innerText = film.title;
+if(els.desc) els.desc.innerText = film.desc;
+if(els.quote) els.quote.innerText = film.quote;
+if(els.author) els.author.innerText = film.author;
+if(els.counter2) els.counter2.innerText = ⁠КАДР ${count}⁠;
+}
+function renderProducts() {
+const grid = document.getElementById('products-grid');
+const emptyState = document.getElementById('empty-state');
+const countLabel = document.getElementById('catalog-count');
+if(!grid) return;
+const filtered = window.state.products.filter(p => p.title.toLowerCase().includes(window.state.searchQuery) || (p.film && p.film.toLowerCase().includes(window.state.searchQuery)));
+if(countLabel) countLabel.innerText = ⁠${filtered.length} ПРЕДМЕТОВ / АРХИВ ПРИНТОВ⁠;
+if (filtered.length === 0) {
+grid.innerHTML = '';
+if(emptyState) emptyState.classList.remove('hidden');
+return;
+}
+if(emptyState) emptyState.classList.add('hidden');
+grid.innerHTML = filtered.map(p => {
+let badgeHtml = '';
+if(p.badge === 'NEW') badgeHtml = ⁠<div class="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2 py-1 z-20">НОВИНКА</div>⁠;
+else if(p.badge === 'SOLD OUT') badgeHtml = ⁠<div class="absolute top-3 right-3 bg-koshei-red text-white text-[10px] font-bold px-2 py-1 z-20">SOLD OUT</div>⁠;
+const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/800x1000/0A0A0A/E51A1A?text=NO+IMAGE';
+return ⁠ <div class="group cursor-pointer relative fade-in" onclick="window.openProductModal('${p.id}')"> ${badgeHtml} <div class="relative aspect-[3/4] bg-[#0A0A0A] border border-[#222] overflow-hidden mb-3"> <div class="absolute top-3 left-3 bg-[#111] border border-[#333] px-2 py-1 tech-text text-white z-10">${p.film || 'КАТАЛОГ'}</div> <img src="${mainImg}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105 transform"> </div> <div class="flex justify-between items-baseline mb-1"> <h3 class="font-bold text-sm uppercase tracking-wide truncate pr-2 w-3/4">${p.title}</h3> <span class="text-sm font-bold whitespace-nowrap">${p.price} ₽</span> </div> <div class="flex justify-between items-center tech-text"> <span class="text-[#666] truncate w-2/3">${(p.sizes || 'S / M / L').replace(/,/g, ' / ')}</span> <span class="text-koshei-red group-hover:text-white transition-colors">СМОТРЕТЬ -></span> </div> </div>⁠
+}).join('');
+}
+function renderLooks() {
+const grid = document.getElementById('looks-grid');
+if(!grid) return;
+if(!window.state.looks || window.state.looks.length === 0) {
+grid.innerHTML = '<div class="col-span-full text-center py-8 tech-text text-[#666]">ПОКА НЕТ ФОТО В ЛУКБУКЕ. БУДЬ ПЕРВЫМ!</div>'; return;
+}
+grid.innerHTML = window.state.looks.map(l => ⁠ <div class="bg-[#0A0A0A] border border-[#222] overflow-hidden flex flex-col"> <div class="aspect-[4/5] bg-black overflow-hidden relative"><img src="${l.img}" class="w-full h-full object-cover"></div> <div class="p-4 flex flex-col justify-between flex-grow"> <p class="text-xs text-white mb-3 italic">«${l.msg}»</p> <div class="tech-text text-koshei-red">— ${l.author || 'СВОЙ'}</div> </div> </div>⁠).join('');
+}
+window.submitLook = async (e) => {
+e.preventDefault();
+const btn = e.target.querySelector('button[type="submit"]');
+btn.innerText = "ОТПРАВЛЯЕМ..."; btn.disabled = true;
+const img = document.getElementById('look-img').value.trim();
+const msg = document.getElementById('look-msg').value.trim();
+const author = document.getElementById('look-author').value.trim() || 'Аноним';
+if(!img || !msg) { alert("Заполните ссылку на фото и сообщение!"); btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false; return; }
+const newLook = { id: Date.now(), img, msg, author };
+try {
+const res = await fetch(⁠https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest⁠, {
+method: 'GET',
+headers: { 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY }
+});
+if(res.ok) {
+const json = await res.json();
+const data = json.record || {};
+if(!data.pendingLooks) data.pendingLooks = [];
+data.pendingLooks.push(newLook);
+const putRes = await fetch(⁠https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}⁠, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY },
+body: JSON.stringify(data)
+});
+if(putRes.ok) {
+alert("Фото успешно отправлено на модерацию администратору!");
+document.getElementById('look-form').reset();
+window.closeLookModal();
+} else {
+alert("Ошибка базы данных.");
+}
+}
+} catch(err) {
+alert("Ошибка сети.");
+}
+btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false;
+}
+let currentGalleryIndex = 0; let currentProductMedia = [];
+window.openProductModal = (id) => {
+const product = window.state.products.find(p => p.id === id);
+if(!product) return;
+window.state.activeProductId = id;
+document.getElementById('pm-film').innerText = ⁠${product.film || 'КАТАЛОГ'} / КОЛЛЕКЦИЯ⁠;
+document.getElementById('pm-title').innerText = product.title;
+document.getElementById('pm-price').innerText = ⁠${product.price} ₽⁠;
+document.getElementById('pm-desc').innerText = product.desc;
+currentProductMedia = [];
+if(product.images && product.images.length > 0) product.images.forEach(img => currentProductMedia.push({ type: 'image', src: img }));
+currentGalleryIndex = 0; renderGallery();
+const sizesArr = (product.sizes || 'S,M,L,XL').split(',').map(s => s.trim());
+document.getElementById('pm-sizes').innerHTML = sizesArr.map(s => ⁠<button onclick="window.selectSize(this, '${s}')" class="size-btn w-10 h-10 border border-[#333] flex items-center justify-center text-xs hover:border-white transition-colors focus:outline-none">${s}</button>⁠).join('');
+const btn = document.getElementById('pm-add-btn');
+if(product.badge === 'SOLD OUT') {
+btn.innerText = 'НЕТ В НАЛИЧИИ'; btn.classList.add('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.remove('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = true;
+} else {
+btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.add('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = false;
+}
+document.getElementById('product-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.selectedSize = null;
+}
+window.renderGallery = () => {
+if(currentProductMedia.length === 0) return;
+const media = currentProductMedia[currentGalleryIndex];
+document.getElementById('pm-main-media').innerHTML = ⁠<img src="${media.src}" class="w-full h-full object-cover">⁠;
+const thumbsContainer = document.getElementById('pm-thumbnails');
+if(currentProductMedia.length > 1) {
+thumbsContainer.innerHTML = currentProductMedia.map((m, idx) => {
+const border = idx === currentGalleryIndex ? 'border-white' : 'border-[#333]';
+return ⁠<div onclick="window.setGalleryIndex(${idx})" class="w-16 h-20 border ${border} cursor-pointer opacity-80 hover:opacity-100 transition-all"><img src="${m.src}" class="w-full h-full object-cover"></div>⁠;
+}).join('');
+} else { thumbsContainer.innerHTML = ''; }
+}
+window.setGalleryIndex = (idx) => { currentGalleryIndex = idx; window.renderGallery(); }
+window.selectSize = (btnElement, size) => {
+document.querySelectorAll('.size-btn').forEach(b => { b.classList.remove('border-white', 'bg-white', 'text-black'); b.classList.add('border-[#333]', 'text-white'); });
+btnElement.classList.remove('border-[#333]', 'text-white'); btnElement.classList.add('border-white', 'bg-white', 'text-black');
+window.selectedSize = size;
+}
+window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden'); document.body.style.overflow = ''; window.state.activeProductId = null; }
+window.addToCart = () => {
+const product = window.state.products.find(p => p.id === window.state.activeProductId);
+if(!product || product.badge === 'SOLD OUT') return;
+const size = window.selectedSize || product.sizes.split(',')[0].trim();
+const existing = window.state.cart.find(item => item.id === product.id && item.size === size);
+if(existing) existing.qty += 1;
+else window.state.cart.push({ id: product.id, title: product.title, price: Number(product.price), size: size, qty: 1, img: product.images[0] });
+renderCartUI(); showToast('ВЕЩЬ ДОБАВЛЕНА В КОРЗИНУ'); closeProductModal();
+}
+function renderCartUI() {
+const totalQty = window.state.cart.reduce((sum, item) => sum + item.qty, 0);
+const cartBadge = document.getElementById('header-cart-count');
+const floatBtn = document.getElementById('floating-cart-btn');
+const floatCnt = document.getElementById('floating-cart-count');
+if(totalQty > 0) {
+if(cartBadge) { cartBadge.innerText = totalQty; cartBadge.classList.remove('hidden'); }
+if(floatBtn) floatBtn.classList.remove('hidden');
+if(floatCnt) floatCnt.innerText = totalQty;
+} else {
+if(cartBadge) cartBadge.classList.add('hidden');
+if(floatBtn) floatBtn.classList.add('hidden');
+}
+}
+window.removeFromCart = (idx) => { window.state.cart.splice(idx, 1); renderCartContents(); renderCartUI(); }
+window.applyPromo = () => {
+const codeInput = document.getElementById('promo-input');
+if(!codeInput) return;
+const code = codeInput.value.trim().toUpperCase();
+if (localStorage.getItem('used_promo_' + code)) {
+window.state.promoCode = ''; window.state.promoDiscount = 0;
+document.getElementById('promo-msg').innerHTML = ⁠<span class="text-koshei-red">Вы уже использовали этот код!</span>⁠; renderCartContents(); return;
+}
+if(window.state.promos && window.state.promos[code]) {
+window.state.promoCode = code; window.state.promoDiscount = window.state.promos[code];
+document.getElementById('promo-msg').innerHTML = ⁠<span class="text-green-500">Применен (-${window.state.promoDiscount*100}%)</span>⁠;
+} else {
+window.state.promoCode = ''; window.state.promoDiscount = 0;
+document.getElementById('promo-msg').innerHTML = ⁠<span class="text-koshei-red">Неверный код</span>⁠;
+}
+renderCartContents();
+}
+function renderCartContents() {
+const list = document.getElementById('cart-items');
+const totalEl = document.getElementById('cart-total');
+const checkoutBtn = document.getElementById('checkout-btn');
+if(!list) return;
+if(window.state.cart.length === 0) {
+list.innerHTML = '<div class="text-center py-10 tech-text text-[#666]">КОРЗИНА ПУСТА</div>';
+if(totalEl) totalEl.innerText = '0 ₽';
+if(checkoutBtn) checkoutBtn.classList.add('opacity-50', 'pointer-events-none');
+return;
+}
+if(checkoutBtn) checkoutBtn.classList.remove('opacity-50', 'pointer-events-none');
+list.innerHTML = window.state.cart.map((item, idx) => ⁠<div class="flex gap-4 items-center border-b border-[#222] pb-4 mb-4 last:border-0"> <img src="${item.img}" class="w-16 h-20 object-cover border border-[#333]"> <div class="flex-grow"> <div class="text-xs font-bold uppercase text-white leading-tight">${item.title}</div> <div class="tech-text text-[#888] mt-1">РАЗМЕР: ${item.size} | КОЛ-ВО: ${item.qty}</div> <div class="text-sm font-bold text-white mt-1">${item.price * item.qty} ₽</div> </div> <button onclick="window.removeFromCart(${idx})" class="text-[#666] hover:text-koshei-red w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button> </div>⁠).join('');
+const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
+let totalHtml = ⁠СУММА: ${subtotal} ₽⁠;
+if(window.state.promoDiscount > 0) totalHtml = ⁠<span class="line-through text-[#666] mr-2">${subtotal} ₽</span> <span class="text-koshei-red">${finalTotal} ₽</span>⁠;
+if(totalEl) totalEl.innerHTML = totalHtml;
+}
+window.checkoutCart = () => {
+if(window.state.cart.length === 0) return;
+const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
+let msg = ⁠🔥 НОВЫЙ ЗАКАЗ 🔥\n\n⁠;
+window.state.cart.forEach((item, i) => { msg += ⁠${i+1}) ${item.title}\nРазмер: ${item.size} — ${item.qty} шт. x ${item.price}₽\n⁠; });
+msg += ⁠\nСумма: ${subtotal} ₽⁠;
+if(window.state.promoCode) { msg += ⁠\nПромокод: ${window.state.promoCode} (-${window.state.promoDiscount*100}%)⁠; localStorage.setItem('used_promo_' + window.state.promoCode, 'true'); }
+msg += ⁠\nИТОГО К ОПЛАТЕ: ${finalTotal} ₽⁠;
+const url = ⁠https://t.me/${window.state.telegramUsername}?text=${encodeURIComponent(msg)}⁠;
+const link = document.createElement('a'); link.href = url; link.target = '_blank'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+window.state.cart = []; window.state.promoCode = ''; window.state.promoDiscount = 0; renderCartContents(); renderCartUI(); closeCart();
+}
+window.showToast = (msg) => {
+const toast = document.getElementById('custom-toast'); const toastMsg = document.getElementById('toast-msg');
+if(!toast || !toastMsg) return;
+toastMsg.innerText = msg; toast.classList.remove('translate-y-[200%]', 'opacity-0');
+setTimeout(() => toast.classList.add('translate-y-[200%]', 'opacity-0'), 3000);
+}
+window.onload = () => { loadCloudData(); };
+</script>
+<div>
+<div class="border-b border-[#222] bg-[#050505] sticky top-0 z-40">
+<div class="px-4 py-3 flex justify-between items-center max-w-[1400px] mx-auto tech-text border-b border-[#111] text-[#777]">
+<div>ОДЕЖДА КАК КАДР ИЗ ФИЛЬМА</div>
+<div>КИНО. УЛИЦА. ПАМЯТЬ.</div>
+</div>
+<div class="px-4 py-4 md:py-6 flex justify-between items-center max-w-[1400px] mx-auto">
+<div class="flex-shrink-0">
+<h1 class="font-impact text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.85] text-koshei-red tracking-tighter uppercase cursor-pointer" onclick="window.scrollTo(0,0)">KOSHEI
+SHMOT</h1>
+</div>
+<div class="flex items-center gap-3 relative z-50">
+<button onclick="window.openCart()" class="w-10 h-10 border border-[#333] flex items-center justify-center hover:border-white transition-colors text-white relative focus:outline-none cursor-pointer">
+<i class="fas fa-shopping-cart text-sm"></i>
+<span id="header-cart-count" class="hidden absolute -top-2 -right-2 bg-koshei-red text-white text-[9px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-lg">0</span>
+</button>
+<button onclick="window.openMenu()" class="w-10 h-10 border border-[#333] flex items-center justify-center hover:border-white transition-colors text-white focus:outline-none z-50 cursor-pointer">
+<i class="fas fa-bars text-base"></i>
+</button>
+</div>
+</div>
+</div>
+<button id="floating-cart-btn" onclick="window.openCart()" class="hidden fixed bottom-6 right-6 z-40 bg-koshei-red text-white w-14 h-14 rounded-full shadow-[0_0_20px_rgba(229,26,26,0.4)] flex items-center justify-center hover:bg-red-700 transition-all hover:scale-110 focus:outline-none cursor-pointer">
+<i class="fas fa-shopping-cart text-xl"></i>
+<span id="floating-cart-count" class="absolute -top-1 -right-1 bg-white text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">1</span>
+</button>
+<main class="max-w-[1400px] mx-auto px-4 py-8 sm:py-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mb-12">
+<div class="lg:col-span-5 flex flex-col justify-center">
+<p class="text-koshei-red tech-text mb-4">ОДЕЖДА ИЗ ДРУГОГО ВРЕМЕНИ</p>
+<h2 class="font-impact text-5xl sm:text-6xl lg:text-[4.5rem] uppercase tracking-tight text-white leading-[0.9] mb-6">ДЕВЯНОСТЫЕ
+НЕ ОТПУСКАЮТ</h2>
+<p class="text-[#888] text-sm md:text-base leading-relaxed mb-8 max-w-md">Городские истории на хлопке. Принты по мотивам культовых российских фильмов, которые мы помним наизусть и носим по-своему.</p>
+<div class="flex items-center gap-4 tech-text text-[#555]">СДЕЛАНО В КАЛИНИНГРАДЕ / МАЛЫЕ ТИРАЖИ</div>
+</div>
+<div class="lg:col-span-7 relative group" id="film-strip-area">
+<div class="dotted-box p-1 relative touch-pan-y">
+<div class="absolute top-3 right-4 tech-text text-[#ccc] z-30 mix-blend-difference" id="hero-film-counter">КАДР 01 / 06</div>
+<div class="absolute bottom-3 left-4 tech-text text-[#ccc] z-30 mix-blend-difference" id="hero-film-year">ПАМЯТИ КИНО — 90-Е</div>
+<div class="w-full aspect-[2/1] bg-[#0A0A0A] overflow-hidden relative flex items-center justify-center">
+<div class="absolute inset-0 bg-black/50 z-10 pointer-events-none"></div>
+<img id="hero-film-img" src="" class="w-full h-full object-cover absolute inset-0 z-0 mix-blend-luminosity transition-opacity duration-700 pointer-events-none">
+<h2 id="hero-film-title-overlay" class="relative z-30 font-impact text-6xl sm:text-7xl md:text-8xl lg:text-[7.5rem] text-koshei-red uppercase tracking-tighter drop-shadow-[0_0_20px_rgba(229,26,26,0.8)] text-center px-4 leading-[0.8] select-none pointer-events-none">БУМЕР</h2>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-20">
+<div class="flex justify-between items-end mb-2">
+<div class="tech-text text-[#666] text-lg">ПЛЁНКА</div>
+<div class="tech-text text-[#444] text-right text-[10px] md:text-xs">АВТОМАТИЧЕСКИ (СМЕНА КАДРА КАЖДЫЕ 5 СЕК)</div>
+</div>
+<div class="w-full border-t border-b border-dashed border-[#333] py-2 bg-[#0A0A0A] relative flex items-center">
+<div class="w-full px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+<div class="flex items-center gap-6 w-full md:w-1/2">
+<div id="strip-tag" class="font-impact text-3xl text-koshei-red">BMR</div>
+<div class="border-l border-[#333] pl-6">
+<h3 id="strip-title" class="font-bold text-white text-lg tracking-wide uppercase mb-1">БУМЕР</h3>
+<p id="strip-desc" class="text-xs text-[#888]">Чёрный BMW, ночная трасса, свобода.</p>
+</div>
+</div>
+<div class="w-full md:w-1/2 text-left md:text-right border-t md:border-t-0 md:border-l border-[#333] pt-4 md:pt-0 pl-0 md:pl-6">
+<div id="strip-quote" class="text-white italic text-sm mb-2">«Не мы такие — жизнь такая.»</div>
+<div id="strip-author" class="tech-text text-[#666]">ПЁТР БУСЛОВ — 2003</div>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center mt-3 px-1">
+<div id="strip-counter" class="tech-text text-[#444]">КАДР 01 / 06</div>
+<div class="tech-text text-[#444]">СИНЕМАТИК АРХИВ</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#222] pb-6 mb-8">
+<div>
+<p class="text-koshei-red tech-text mb-1">ВЕЩИ ДЛЯ СВОИХ</p>
+<h2 class="font-impact text-5xl md:text-6xl uppercase tracking-tight text-white leading-none">КАТАЛОГ</h2>
+<div id="catalog-count" class="tech-text text-[#555] mt-2">0 ПРЕДМЕТОВ / АРХИВ ПРИНТОВ</div>
+</div>
+<div class="flex items-center gap-2 w-full md:w-auto">
+<div class="relative w-full md:w-72">
+<i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#555] text-xs"></i>
+<input type="text" oninput="window.handleSearch(event)" placeholder="Найти вещь или фильм" class="w-full bg-[#0A0A0A] border border-[#333] text-white py-2 pl-9 pr-4 focus:outline-none focus:border-white transition-colors text-xs font-mono placeholder-[#555]">
+</div>
+</div>
+</div>
+<div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10 mb-24"></div>
+<div id="empty-state" class="hidden py-32 text-center dotted-box mt-8 bg-[#0A0A0A] mb-24">
+<h3 class="font-bold text-lg uppercase text-white mb-2 tracking-wide">ЗАГРУЗКА ИЛИ НЕТ ВЕЩЕЙ...</h3>
+<p class="text-[#666] text-sm">Вещи скоро появятся.</p>
+</div>
+</main>
+</div>
+<footer class="max-w-[1400px] mx-auto px-4 py-12 border-t border-[#222] mt-20 flex flex-col md:flex-row justify-between items-center tech-text text-[#666] gap-4 w-full">
+<div>© 2026 KOSHEI SHMOT. ВСЕ ПРАВА ЗАЩИЩЕНЫ. СДЕЛАНО В КАЛИНИНГРАДЕ.</div>
+<div class="flex items-center gap-6">
+<a href="https://t.me/KOSHEI_SHMOT" target="_blank" class="hover:text-white transition-colors">TELEGRAM: @KOSHEI_SHMOT</a>
+</div>
+</footer>
+<!-- Модальное меню -->
+<div id="menu-modal" class="hidden fixed inset-0 z-[120] flex bg-black/95 backdrop-blur-md">
+<div class="w-full max-w-md mx-auto h-full bg-[#050505] border-l border-r border-[#222] flex flex-col justify-between p-8 relative">
+<button onclick="window.closeMenu()" class="absolute top-6 right-6 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+<div>
+<h2 class="font-impact text-3xl text-koshei-red uppercase mb-10 tracking-tight">KOSHEI MENU</h2>
+<div class="flex flex-col space-y-6">
+<button onclick="window.openMusicModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+<span>МУЗЫКА И КАССЕТЫ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
+</button>
+<button onclick="window.openArchiveModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+<span>АРХИВ / МАНИФЕСТ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
+</button>
+<button onclick="window.openLooksGalleryModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+<span>ЛУКБУК (СВОИ)</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
+</button>
+<button onclick="window.openLookModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+<span>+ ДОБАВИТЬ СВОЙ ЛУК</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
+</button>
+<button onclick="window.openInfoModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+<span>О ПРОЕКТЕ И ДОСТАВКЕ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
+</button>
+<a href="https://t.me/KOSHEI_SHMOT" target="_blank" class="text-left font-impact text-2xl text-koshei-red hover:text-white uppercase transition-colors flex items-center justify-between">
+<span>ТЕЛЕГРАМ КАНАЛ</span> <i class="fab fa-telegram-plane text-xs"></i>
+</a>
+</div>
+</div>
+<div id="secret-keys-menu-btn-wrap" class="pt-4 border-t border-[#222]">
+<button onclick="window.openSecretKeysModal()" class="w-full py-2 tech-text text-[#444] hover:text-koshei-red transition-colors text-center cursor-pointer">[ НАСТРОЙКА СЕТИ ]</button>
+</div>
+</div>
+</div>
+<!-- Модалка ввода ключей -->
+<div id="secret-keys-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+<div class="bg-[#050505] border border-koshei-red p-8 w-full max-w-md relative">
+<button onclick="window.closeSecretKeysModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="font-impact text-2xl text-white mb-2 uppercase">СВЯЗЬ С БАЗОЙ ДАННЫХ</h3>
+<p class="tech-text text-koshei-red mb-6">ВВЕДИТЕ ДАННЫЕ ДОСТУПА</p>
+<div id="pin-entry-box" class="space-y-4">
+<input type="password" id="secret-pin-input" placeholder="Код доступа" class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs">
+<button onclick="window.checkSecretPin()" class="w-full bg-koshei-red text-white font-bold py-3 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ПОДТВЕРДИТЬ</button>
+</div>
+<div id="keys-entry-box" class="hidden space-y-4">
+<div>
+<label class="tech-text block mb-1 text-white">Bin ID</label>
+<input type="text" id="settings-bin-id" class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs">
+</div>
+<div>
+<label class="tech-text block mb-1 text-white">Access Key / Master Key</label>
+<input type="text" id="settings-access-key" class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs">
+</div>
+<button onclick="window.saveSecretKeys()" class="w-full bg-green-600 text-white font-bold py-3 uppercase text-xs hover:bg-green-500 transition-colors cursor-pointer">ГОТОВО (СОХРАНИТЬ)</button>
+</div>
+</div>
+</div>
+<!-- Музыка -->
+<div id="music-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+<div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar">
+<button onclick="window.closeMusicModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="font-impact text-3xl text-white mb-2 uppercase">МУЗЫКА И АКУСТИКА ЭПОХИ</h3>
+<p class="tech-text text-koshei-red mb-6">ВИНИЛ, КАССЕТЫ И ПЛЕЕРЫ</p>
+<div class="space-y-6 text-sm text-[#ccc]">
+<div>
+<h4 class="text-white font-bold uppercase text-xs mb-3 text-koshei-red tracking-wider">🎵 САУНДТРЕКИ КИНО (КАССЕТЫ И ВИНИЛ):</h4>
+<div class="space-y-3">
+<div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
+<div><div class="font-bold text-white uppercase text-xs">Nautilus Pompilius — Зверь / Военные песни</div><div class="tech-text text-[#777]">OST Брат (1997) • Аудиокассета</div></div><i class="fas fa-compact-disc text-koshei-red text-xl animate-spin"></i>
+</div>
+<div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
+<div><div class="font-bold text-white uppercase text-xs">Би-2 — Полковнику никто не пишет</div><div class="tech-text text-[#777]">OST Брат 2 (2000) • Винил</div></div><i class="fas fa-compact-disc text-koshei-red text-xl"></i>
+</div>
+<div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
+<div><div class="font-bold text-white uppercase text-xs">Смысловые Галлюцинации — Вечно молодой</div><div class="tech-text text-[#777]">OST Брат 2 (2000) • Магнитная лента</div></div><i class="fas fa-compact-disc text-koshei-red text-xl"></i>
+</div>
+</div>
+</div>
+<div class="border-t border-[#222] pt-4">
+<h4 class="text-white font-bold uppercase text-xs mb-2 text-koshei-red tracking-wider">🎧 АППАРАТУРА И АТМОСФЕРА:</h4>
+<p class="text-xs text-[#999] leading-relaxed">
+Потёртые кассетные плееры с западающими кнопками Play, христящие колонки в чёрном BMW и тяжёлые пластинки на проигрывателе — это звуковой фундамент нашего времени, который мы переносим на графику принтов и атмосферу бренда.
+</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Архив -->
+<div id="archive-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+<div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[85vh] overflow-y-auto no-scrollbar">
+<button onclick="window.closeArchiveModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="font-impact text-3xl text-white mb-2 uppercase">МАНИФЕСТ И АРХИВ</h3>
+<p class="tech-text text-koshei-red mb-6">ПОЧЕМУ ДЕВЯНОСТЫЕ НЕ ОТПУСКАЮТ</p>
+<div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
+<p><strong class="text-white">KOSHEI SHMOT</strong> — это не просто одежда. Это попытка зафиксировать время, которое оставило шрам на поколениях.</p>
+<blockquote class="border-l-2 border-koshei-red pl-4 text-white italic my-4">«В чём сила, брат? А я вот думаю, что сила в правде.»</blockquote>
+</div>
+</div>
+</div>
+<!-- Галерея лукбука -->
+<div id="looks-gallery-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+<div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
+<button onclick="window.closeLooksGalleryModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="font-impact text-3xl text-white mb-2 uppercase">УЛИЧНАЯ ХРОНИКА / ЛУКБУК</h3>
+<p class="tech-text text-koshei-red mb-6">ФОТО И ЦИТАТЫ НАШИХ ЛЮДЕЙ</p>
+<div id="looks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</div>
+</div>
+<!-- Добавить лук -->
+<div id="look-submit-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+<div class="bg-[#050505] border border-[#333] p-8 w-full max-w-md relative">
+<button onclick="window.closeLookModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="font-impact text-2xl text-white mb-2 uppercase">ДОБАВИТЬ В ЛУКБУК</h3>
+<p class="tech-text text-koshei-red mb-6">ФОТО ПРОЙДЕТ ПРОВЕРКУ АДМИНИСТРАТОРОМ</p>
+<form id="look-form" onsubmit="window.submitLook(event)" class="space-y-4">
+<div><label class="tech-text block mb-1 text-white">Прямая ссылка на фото</label><input type="url" id="look-img" placeholder="https://..." required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+<div><label class="tech-text block mb-1 text-white">Ваша цитата / сообщение</label><input type="text" id="look-msg" placeholder="Не мы такие — жизнь такая" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+<div><label class="tech-text block mb-1 text-white">Имя / Город</label><input type="text" id="look-author" placeholder="Макс, Калининград" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+<button type="submit" class="w-full bg-koshei-red text-white font-bold py-3 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ОТПРАВИТЬ НА МОДЕРАЦИЮ</button>
+</form>
+</div>
+</div>
+<!-- О проекте и доставке -->
+<div id="info-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+<div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
+<button onclick="window.closeInfoModal()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times text-lg"></i></button>
+<h3 class="text-white font-impact text-3xl mb-6 uppercase">О ПРОЕКТЕ И ДОСТАВКЕ</h3>
+<div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
+<p><strong class="text-white">KOSHEI SHMOT</strong> — независимый бренд одежды родом из <strong class="text-white">Калининграда</strong>. Мы создаем вещи, пропитанные духом отечественного кинематографа 90-х и нулевых. Каждый принт отсылает к культовым лентам («Брат», «Бумер», «Жмурки», «Сёстры»), переосмысленным в формате современного уличного мерча.</p>
+<div class="border-t border-[#222] pt-4 mt-4">
+<h4 class="text-white font-bold uppercase mb-2 text-xs text-koshei-red tracking-wider">📦 ДОСТАВКА И ОФОРМЛЕНИЕ ЗАКАЗА:</h4>
+<ul class="list-disc pl-5 space-y-2 text-[#aaa]">
+<li><strong class="text-white">Как сделать заказ:</strong> Вы добавляете нужные вещи в корзину и нажимаете кнопку <strong class="text-white">«Оформить в Telegram»</strong>. Заказ автоматически переносится в наш чат поддержки, где менеджер быстро подтвердит наличие и размеры.</li>
+<li><strong class="text-white">Откуда отправка:</strong> Все заказы упаковываются и отправляются напрямую из <strong class="text-white">Калининграда</strong>.</li>
+<li><strong class="text-white">Способы доставки:</strong> Отправляем Почтой России или транспортной компанией СДЭК в любой регион. Трек-номер для отслеживания предоставляется сразу после отправки.</li>
+<li><strong class="text-white">Оплата:</strong> Детали и удобный способ оплаты согласовываются с менеджером в Telegram при подтверждении заказа.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Карточка товара -->
+<div id="product-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-8 bg-black/90 backdrop-blur-sm">
+<div class="bg-[#0f0f0f] w-full h-full md:h-[85vh] max-w-6xl flex flex-col md:flex-row relative border border-[#222] shadow-2xl overflow-y-auto md:overflow-hidden">
+<button onclick="window.closeProductModal()" class="absolute top-4 right-4 text-[#666] hover:text-white z-50 w-10 h-10 flex items-center justify-center bg-black/50 rounded-full focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+<div class="w-full md:w-1/2 h-[50vh] md:h-full bg-[#050505] border-b md:border-b-0 md:border-r border-[#222] flex flex-col relative">
+<div id="pm-main-media" class="w-full flex-grow relative overflow-hidden bg-black flex items-center justify-center"></div>
+<div id="pm-thumbnails" class="h-24 bg-[#0A0A0A] border-t border-[#222] flex items-center px-4 gap-2 overflow-x-auto no-scrollbar shrink-0"></div>
+</div>
+<div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col relative bg-[#0f0f0f] overflow-y-auto">
+<div id="pm-film" class="text-koshei-red tech-text mb-3">КОЛЛЕКЦИЯ</div>
+<h2 id="pm-title" class="font-impact text-3xl md:text-4xl uppercase text-white mb-2 leading-tight">ФУТБОЛКА</h2>
+<div id="pm-price" class="text-xl font-bold text-white mb-6">0 ₽</div>
+<p id="pm-desc" class="text-sm text-[#888] mb-8 leading-relaxed whitespace-pre-line"></p>
+<div class="mb-8">
+<div class="flex justify-between items-center mb-3">
+<div class="tech-text text-[#555]">РАЗМЕР</div>
+<button onclick="window.openSizeGuide()" class="tech-text text-koshei-red underline focus:outline-none cursor-pointer">[СЕТКА РАЗМЕРОВ]</button>
+</div>
+<div id="pm-sizes" class="flex gap-2 flex-wrap"></div>
+</div>
+<button id="pm-add-btn" onclick="window.addToCart()" class="w-full bg-koshei-red text-white font-bold uppercase text-sm py-4 hover:bg-red-700 transition-colors flex items-center justify-center gap-2 mb-8 mt-auto focus:outline-none cursor-pointer">
+<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ
+</button>
+</div>
+</div>
+</div>
+<!-- Корзина -->
+<div id="cart-modal" class="hidden fixed inset-0 z-[110] flex justify-end bg-black/80 backdrop-blur-sm">
+<div class="w-full md:w-[450px] h-full bg-[#050505] border-l border-[#333] shadow-2xl flex flex-col relative">
+<div class="p-6 border-b border-[#222] flex justify-between items-center">
+<h2 class="font-impact text-2xl uppercase text-white">ВАШ ЗАКАЗ</h2>
+<button onclick="window.closeCart()" class="text-[#666] hover:text-white p-2 focus:outline-none cursor-pointer"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div id="cart-items" class="flex-grow p-6 overflow-y-auto no-scrollbar"></div>
+<div class="border-t border-[#222] p-6 bg-[#0A0A0A]">
+<div class="flex gap-2 mb-4">
+<input type="text" id="promo-input" placeholder="Промокод" class="w-2/3 bg-transparent border border-[#333] text-white py-2 px-3 text-xs uppercase focus:outline-none focus:border-koshei-red">
+<button onclick="window.applyPromo()" class="w-1/3 border border-[#333] text-xs font-bold text-white hover:bg-white hover:text-black transition-colors focus:outline-none cursor-pointer">ПРИМЕНИТЬ</button>
+</div>
+<div id="promo-msg" class="tech-text mb-4 min-h-[16px]"></div>
+<div class="flex justify-between items-end mb-6">
+<div class="tech-text text-[#666]">ИТОГО:</div>
+<div id="cart-total" class="text-xl font-bold text-white">0 ₽</div>
+</div>
+<button id="checkout-btn" onclick="window.checkoutCart()" class="w-full bg-white text-black font-bold uppercase text-sm py-4 hover:bg-gray-200 flex items-center justify-center gap-2 focus:outline-none cursor-pointer">
+<i class="fab fa-telegram-plane"></i> ОФОРМИТЬ В TELEGRAM
+</button>
+</div>
+</div>
+</div>
+<!-- Сетка размеров -->
+<div id="size-guide-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/90">
+<div class="bg-[#050505] border border-[#333] p-6 w-full max-w-md relative">
+<button onclick="window.closeSizeGuide()" class="absolute top-4 right-4 text-[#666] hover:text-white focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+<h3 class="text-white font-impact text-xl mb-4 text-center uppercase">СЕТКА РАЗМЕРОВ</h3>
+<table class="w-full text-xs text-left border border-[#333] text-[#ccc]">
+<tr class="bg-[#111]"><th class="border border-[#333] p-2">Размер</th><th class="border border-[#333] p-2">Грудь (см)</th><th class="border border-[#333] p-2">Длина (см)</th></tr>
+<tr><td class="border border-[#333] p-2 font-bold">S</td><td class="border border-[#333] p-2">50</td><td class="border border-[#333] p-2">70</td></tr>
+<tr><td class="border border-[#333] p-2 font-bold">M</td><td class="border border-[#333] p-2">53</td><td class="border border-[#333] p-2">72</td></tr>
+<tr><td class="border border-[#333] p-2 font-bold">L</td><td class="border border-[#333] p-2">56</td><td class="border border-[#333] p-2">74</td></tr>
+<tr><td class="border border-[#333] p-2 font-bold">XL</td><td class="border border-[#333] p-2">59</td><td class="border border-[#333] p-2">76</td></tr>
+</table>
+</div>
+</div>
+<div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[200] bg-white text-black font-bold uppercase text-[10px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl">
+<i class="fas fa-check"></i> <span id="toast-msg">ДОБАВЛЕНО</span>
+</div>
+</body>
+</html>
