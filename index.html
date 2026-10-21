@@ -34,6 +34,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .header-safe-zone { position: relative; z-index: 90 !important; }
         
+        /* Жесткие несгораемые крестики для мобилок */
         .close-btn-super {
             position: absolute;
             top: 16px;
@@ -61,6 +62,13 @@
         /* Пасхалка мод */
         .easter-egg-mode { background-color: #3a0000 !important; }
     </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E51A1A">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/Koshei_Shmot/sw.js');
+      }
+    </script>
 </head>
 <body class="bg-koshei-dark text-gray-300 min-h-screen flex flex-col justify-between" id="main-body">
 
@@ -73,7 +81,7 @@
             
             <div class="px-4 py-4 md:py-6 flex justify-between items-center max-w-[1400px] mx-auto relative">
                 <div class="flex-shrink-0 z-50 select-none">
-                    <!-- СЕКРЕТНЫЙ ТРИГГЕР НА ЛОГОТИПЕ -->
+                    <!-- СЕКРЕТНЫЙ ТРИГГЕР НА ЛОГОТИПЕ (5 кликов) -->
                     <h1 class="font-impact text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.85] text-koshei-red tracking-tighter uppercase cursor-pointer" onclick="window.triggerSecret()">KOSHEI<br>SHMOT</h1>
                 </div>
 
@@ -96,7 +104,6 @@
         </button>
 
         <main class="max-w-[1400px] mx-auto px-4 py-8 sm:py-12 relative z-10">
-            <!-- Блок с пленкой -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mb-12">
                 <div class="lg:col-span-5 flex flex-col justify-center">
                     <p class="text-koshei-red tech-text mb-4">ОДЕЖДА ИЗ ДРУГОГО ВРЕМЕНИ</p>
@@ -152,7 +159,7 @@
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <div class="relative w-full md:w-72">
                         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#555] text-xs"></i>
-                        <input type="text" oninput="window.handleSearch(event)" placeholder="Найти вещь или фильм" class="w-full bg-[#0A0A0A] border border-[#333] text-white py-3 pl-9 pr-4 focus:outline-none focus:border-white transition-colors text-xs font-mono placeholder-[#555]">
+                        <input type="text" oninput="window.handleSearch(event)" placeholder="Найти вещь или фильм (Сила...)" class="w-full bg-[#0A0A0A] border border-[#333] text-white py-3 pl-9 pr-4 focus:outline-none focus:border-white transition-colors text-xs font-mono placeholder-[#555]">
                     </div>
                 </div>
             </div>
@@ -209,7 +216,7 @@
         </div>
     </div>
 
-    <!-- СЕКРЕТНЫЕ НАСТРОЙКИ СЕТИ (Открываются только по секретному клику) -->
+    <!-- СЕКРЕТНЫЕ НАСТРОЙКИ СЕТИ (Открываются по 5 кликам на логотип) -->
     <div id="secret-keys-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-koshei-red p-8 w-full max-w-md relative">
             <button onclick="window.closeSecretKeysModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
@@ -288,7 +295,7 @@
         </div>
     </div>
 
-    <!-- Остальные модалки (Музыка, Плейлист, Архив, Лукбук, Инфо) -->
+    <!-- Модалки (Музыка, Плейлист, Архив, Инфо с FAQ) -->
     <div id="music-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
             <button onclick="window.closeMusicModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
@@ -336,7 +343,7 @@
         </div>
     </div>
 
-    <!-- FAQ добавлен сюда -->
+    <!-- ИНФО С ДОСТАВКОЙ И FAQ -->
     <div id="info-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20">
             <button onclick="window.closeInfoModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
@@ -375,7 +382,7 @@
         </div>
     </div>
 
-    <!-- Лукбук с пагинацией -->
+    <!-- Лукбук с пагинацией (Загрузить еще) -->
     <div id="looks-gallery-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20 flex flex-col">
             <button onclick="window.closeLooksGalleryModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
@@ -414,12 +421,11 @@
         </div>
     </div>
 
-    <!-- Всплывающее уведомление -->
+    <!-- Уведомление -->
     <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[300] bg-white text-black font-bold uppercase text-[12px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl pointer-events-none rounded-full whitespace-nowrap">
         <i class="fas fa-info-circle text-koshei-red"></i> <span id="toast-msg">УВЕДОМЛЕНИЕ</span>
     </div>
 
-    <!-- ГЛАВНЫЙ СКРИПТ -->
     <script>
         let JSONBIN_BIN_ID = localStorage.getItem('koshei_main_bin_id') || "6ad4d653ac6210605a3c4912";
         let JSONBIN_ACCESS_KEY = localStorage.getItem('koshei_main_access_key') || "$2a$10$HHmF6ZgWCnPVqG9Ggxp/EOBYkZiG5pocHmYToVmlv/I66cdgwqaQy";
@@ -432,7 +438,6 @@
 
         let filmInterval = null;
 
-        // ГЛОБАЛЬНЫЕ КНОПКИ (МОДАЛКИ)
         window.openMenu = () => { document.getElementById('menu-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
         window.closeMenu = () => { document.getElementById('menu-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
@@ -461,7 +466,7 @@
         window.closeSizeGuide = () => { document.getElementById('size-guide-modal').classList.add('hidden'); };
         window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden'); document.body.style.overflow = ''; window.state.activeProductId = null; };
 
-        // СЕКРЕТНЫЙ ТРИГГЕР НАСТРОЕК (5 КЛИКОВ ПО ЛОГО)
+        // Секретный триггер по 5 кликам на логотип
         let secretClickCount = 0;
         let secretClickTimer = null;
         window.triggerSecret = () => {
@@ -522,15 +527,14 @@
                 renderProducts(); renderFilmSlide(); renderCartUI(); setupSwipeListeners(); resetAutoPlay();
             }
 
-            // ПАСХАЛКА В ПОИСКЕ
+            // ПАСХАЛКА В ПОИСКЕ (СИЛА / ДАНИЛА)
             window.handleSearch = (e) => { 
                 const q = (e.target.value || '').toLowerCase().trim();
                 window.state.searchQuery = q; 
                 
                 if(q === 'сила' || q === 'данила') {
                     document.getElementById('main-body').classList.add('easter-egg-mode');
-                    window.showToast("ПАСХАЛКА: СИЛА В ПРАВДЕ! СКИДКА НАЙДЕНА.");
-                    // Вкидываем фейковый промокод для атмосферы (если захотите, добавите его в админке)
+                    window.showToast("ПАСХАЛКА: СИЛА В ПРАВДЕ!");
                     setTimeout(() => { document.getElementById('main-body').classList.remove('easter-egg-mode'); }, 4000);
                 }
                 
