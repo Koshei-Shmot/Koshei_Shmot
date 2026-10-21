@@ -32,8 +32,32 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* Жесткая защита поверх всех слоев для шапки */
-        .header-safe-zone { position: relative; z-index: 9999 !important; }
+        .header-safe-zone { position: relative; z-index: 90 !important; }
+        
+        /* Жесткий стиль для мобильных крестиков, чтобы они всегда нажимались */
+        .close-btn-super {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 250 !important;
+            width: 56px;
+            height: 56px;
+            background-color: #111;
+            border: 2px solid #333;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            touch-action: manipulation;
+        }
+        .close-btn-super:hover, .close-btn-super:active {
+            background-color: #E51A1A;
+            border-color: #E51A1A;
+        }
     </style>
 </head>
 <body class="bg-koshei-dark text-gray-300 min-h-screen flex flex-col justify-between">
@@ -51,21 +75,21 @@
                 </div>
 
                 <div class="flex items-center gap-3 relative z-50">
-                    <button onclick="window.openCart()" class="w-12 h-12 border border-[#333] flex items-center justify-center hover:border-white transition-colors text-white relative focus:outline-none cursor-pointer bg-black active:bg-[#333]">
-                        <i class="fas fa-shopping-cart text-lg"></i>
-                        <span id="header-cart-count" class="hidden absolute -top-2 -right-2 bg-koshei-red text-white text-[10px] w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-lg">0</span>
+                    <button onclick="window.openCart()" class="w-14 h-14 border-2 border-[#333] flex items-center justify-center hover:border-white transition-colors text-white relative focus:outline-none cursor-pointer bg-black active:bg-[#333]">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="header-cart-count" class="hidden absolute -top-2 -right-2 bg-koshei-red text-white text-[12px] w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-lg">0</span>
                     </button>
-                    <button onclick="window.openMenu()" class="w-12 h-12 border border-[#333] flex items-center justify-center hover:border-white transition-colors text-white focus:outline-none cursor-pointer bg-black active:bg-[#333]">
-                        <i class="fas fa-bars text-xl"></i>
+                    <button onclick="window.openMenu()" class="w-14 h-14 border-2 border-[#333] flex items-center justify-center hover:border-white transition-colors text-white focus:outline-none cursor-pointer bg-black active:bg-[#333]">
+                        <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Плавающая кнопка корзины -->
-        <button id="floating-cart-btn" onclick="window.openCart()" class="hidden fixed bottom-6 right-6 z-40 bg-koshei-red text-white w-14 h-14 rounded-full shadow-[0_0_20px_rgba(229,26,26,0.5)] flex items-center justify-center hover:bg-red-700 transition-all hover:scale-110 focus:outline-none cursor-pointer">
-            <i class="fas fa-shopping-cart text-xl"></i>
-            <span id="floating-cart-count" class="absolute -top-1 -right-1 bg-white text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">1</span>
+        <button id="floating-cart-btn" onclick="window.openCart()" class="hidden fixed bottom-6 right-6 z-[80] bg-koshei-red text-white w-16 h-16 rounded-full shadow-[0_0_20px_rgba(229,26,26,0.5)] flex items-center justify-center hover:bg-red-700 transition-all hover:scale-110 focus:outline-none cursor-pointer">
+            <i class="fas fa-shopping-cart text-2xl"></i>
+            <span id="floating-cart-count" class="absolute -top-1 -right-1 bg-white text-black text-[12px] w-6 h-6 flex items-center justify-center rounded-full font-bold border-2 border-koshei-red">1</span>
         </button>
 
         <main class="max-w-[1400px] mx-auto px-4 py-8 sm:py-12 relative z-10">
@@ -146,15 +170,26 @@
         </div>
     </footer>
 
+    <!-- ГЛАВНОЕ МЕНЮ (ТРИ ПОЛОСКИ) -->
     <div id="menu-modal" class="hidden fixed inset-0 z-[120] flex bg-black/95 backdrop-blur-md">
         <div class="w-full max-w-md mx-auto h-full bg-[#050505] border-l border-r border-[#222] flex flex-col p-8 relative overflow-y-auto no-scrollbar">
-            <button onclick="window.closeMenu()" class="absolute top-6 right-6 text-[#666] hover:text-white text-3xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
-            <div class="flex-grow">
+            
+            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
+            <button onclick="window.closeMenu()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="flex-grow pt-14">
                 <h2 class="font-impact text-3xl text-koshei-red uppercase mb-10 tracking-tight">KOSHEI MENU</h2>
                 <div class="flex flex-col space-y-6">
                     <button onclick="window.openMusicModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>МУЗЫКА И КАССЕТЫ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
                     </button>
+                    <!-- НОВАЯ СТРОКА: ПЛЕЙЛИСТ -->
+                    <button onclick="window.openPlaylistModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
+                        <span>ПЛЕЙЛИСТ</span> <i class="fas fa-play text-xs text-[#555]"></i>
+                    </button>
+
                     <button onclick="window.openArchiveModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>АРХИВ / МАНИФЕСТ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
                     </button>
@@ -167,26 +202,31 @@
                     <button onclick="window.openInfoModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>О ПРОЕКТЕ И ДОСТАВКЕ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
                     </button>
-                    <a href="https://t.me/KOSHEI_SHMOT" target="_blank" class="text-left font-impact text-2xl text-koshei-red hover:text-white uppercase transition-colors flex items-center justify-between">
+                    
+                    <a href="https://t.me/KOSHEI_SHMOT" target="_blank" class="text-left font-impact text-2xl text-koshei-red hover:text-white uppercase transition-colors flex items-center justify-between mt-4 border-t border-[#222] pt-6">
                         <span>ТЕЛЕГРАМ КАНАЛ</span> <i class="fab fa-telegram-plane text-xl"></i>
                     </a>
                 </div>
             </div>
             
+            <!-- Секретная кнопка настроек -->
             <div id="secret-keys-menu-btn-wrap" class="pt-8 mt-auto pb-4">
                 <button onclick="window.openSecretKeysModal()" class="w-full py-3 tech-text text-[#333] hover:text-[#555] transition-colors text-center cursor-pointer tracking-widest">[ НАСТРОЙКА СЕТИ ]</button>
             </div>
         </div>
     </div>
 
+    <!-- СЕКРЕТНЫЕ НАСТРОЙКИ СЕТИ -->
     <div id="secret-keys-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-koshei-red p-8 w-full max-w-md relative">
-            <button onclick="window.closeSecretKeysModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
-            <h3 class="font-impact text-2xl text-white mb-2 uppercase">БАЗА ДАННЫХ</h3>
+            <button onclick="window.closeSecretKeysModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="font-impact text-2xl text-white mb-2 uppercase pt-4">БАЗА ДАННЫХ</h3>
             <p class="tech-text text-koshei-red mb-6">АВТОРИЗАЦИЯ ДОСТУПА</p>
             
             <div id="pin-entry-box" class="space-y-4">
-                <input type="password" id="secret-pin-input" placeholder="Код доступа" class="bg-[#111] border border-[#333] text-white p-4 w-full text-sm font-mono text-center tracking-widest">
+                <input type="password" id="secret-pin-input" placeholder="Введите код доступа..." class="bg-[#111] border border-[#333] text-white p-4 w-full text-sm font-mono text-center tracking-widest">
                 <button onclick="window.checkSecretPin()" class="w-full bg-koshei-red text-white font-bold py-4 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ВОЙТИ</button>
             </div>
 
@@ -204,14 +244,21 @@
         </div>
     </div>
 
-    <!-- Корзина -->
+    <!-- КОРЗИНА -->
     <div id="cart-modal" class="hidden fixed inset-0 z-[140] flex justify-end bg-black/80 backdrop-blur-sm">
-        <div class="w-full md:w-[450px] h-full bg-[#050505] border-l border-[#333] shadow-2xl flex flex-col relative">
-            <div class="p-6 border-b border-[#222] flex justify-between items-center bg-[#050505]">
-                <h2 class="font-impact text-2xl uppercase text-white">ВАШ ЗАКАЗ</h2>
-                <button onclick="window.closeCart()" class="text-[#666] hover:text-white p-2 text-2xl focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="w-full md:w-[450px] h-full bg-[#050505] border-l border-[#333] shadow-2xl flex flex-col relative pt-16 md:pt-0">
+            
+            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
+            <button onclick="window.closeCart()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="p-6 border-b border-[#222] bg-[#050505]">
+                <h2 class="font-impact text-3xl uppercase text-white">ВАШ ЗАКАЗ</h2>
             </div>
+            
             <div id="cart-items" class="flex-grow p-6 overflow-y-auto no-scrollbar bg-[#050505]"></div>
+            
             <div class="border-t border-[#222] p-6 bg-[#0A0A0A]">
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="promo-input" placeholder="Промокод" class="w-2/3 bg-[#111] border border-[#333] text-white py-3 px-4 text-xs uppercase focus:outline-none focus:border-koshei-red">
@@ -230,9 +277,14 @@
     </div>
 
     <!-- Модалка Товара -->
-    <div id="product-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-0 md:p-8 bg-black/90 backdrop-blur-sm">
-        <div class="bg-[#0f0f0f] w-full h-full md:h-[85vh] max-w-6xl flex flex-col md:flex-row relative border border-[#222] shadow-2xl overflow-y-auto md:overflow-hidden">
-            <button onclick="window.closeProductModal()" class="absolute top-4 right-4 text-[#aaa] hover:text-white z-50 w-12 h-12 flex items-center justify-center bg-black/80 rounded-full focus:outline-none cursor-pointer text-xl border border-[#333]"><i class="fas fa-times"></i></button>
+    <div id="product-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-0 md:p-8 bg-black/95 backdrop-blur-sm">
+        <div class="bg-[#0f0f0f] w-full h-full md:h-[85vh] max-w-6xl flex flex-col md:flex-row relative border border-[#222] shadow-2xl overflow-y-auto md:overflow-hidden pt-16 md:pt-0">
+            
+            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
+            <button onclick="window.closeProductModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
+            
             <div class="w-full md:w-1/2 h-[50vh] md:h-full bg-[#050505] border-b md:border-b-0 md:border-r border-[#222] flex flex-col relative">
                 <div id="pm-main-media" class="w-full flex-grow relative overflow-hidden bg-black flex items-center justify-center"></div>
                 <div id="pm-thumbnails" class="h-24 bg-[#0A0A0A] border-t border-[#222] flex items-center px-4 gap-2 overflow-x-auto no-scrollbar shrink-0"></div>
@@ -240,7 +292,7 @@
             <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col relative bg-[#0f0f0f] overflow-y-auto">
                 <div id="pm-film" class="text-koshei-red tech-text mb-3">КОЛЛЕКЦИЯ</div>
                 <h2 id="pm-title" class="font-impact text-3xl md:text-4xl uppercase text-white mb-2 leading-tight">ФУТБОЛКА</h2>
-                <div id="pm-price" class="text-xl font-bold text-white mb-6">0 ₽</div>
+                <div id="pm-price" class="text-2xl font-bold text-white mb-6">0 ₽</div>
                 <p id="pm-desc" class="text-sm text-[#888] mb-8 leading-relaxed whitespace-pre-line"></p>
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-3">
@@ -258,8 +310,10 @@
 
     <!-- Музыка -->
     <div id="music-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar">
-            <button onclick="window.closeMusicModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
+            <button onclick="window.closeMusicModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">МУЗЫКА И АКУСТИКА ЭПОХИ</h3>
             <p class="tech-text text-koshei-red mb-6">ВИНИЛ, КАССЕТЫ И ПЛЕЕРЫ</p>
             <div class="space-y-6 text-sm text-[#ccc]">
@@ -281,10 +335,30 @@
         </div>
     </div>
 
+    <!-- НОВЫЙ МОДАЛ: ПЛЕЙЛИСТ -->
+    <div id="playlist-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
+            <button onclick="window.closePlaylistModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="font-impact text-3xl text-white mb-2 uppercase">ПЛЕЙЛИСТ KOSHEI</h3>
+            <p class="tech-text text-koshei-red mb-6">САУНДТРЕК НАШИХ УЛИЦ</p>
+            <div class="space-y-4 text-[#ccc] text-sm leading-relaxed">
+                <p>Здесь будет собран наш официальный плейлист с треками, которые вдохновляют нас на создание коллекций.</p>
+                <div class="border border-[#222] bg-[#0A0A0A] p-10 mt-6 text-center text-[#666] tech-text flex flex-col items-center gap-4">
+                    <i class="fas fa-headphones text-4xl text-[#333]"></i>
+                    <span>В БУДУЩЕМ ЗДЕСЬ БУДЕТ ВСТРОЕННЫЙ ПЛЕЕР<br>(YANDEX MUSIC / VK / SPOTIFY)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Архив -->
     <div id="archive-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[85vh] overflow-y-auto no-scrollbar">
-            <button onclick="window.closeArchiveModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
+            <button onclick="window.closeArchiveModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">МАНИФЕСТ И АРХИВ</h3>
             <p class="tech-text text-koshei-red mb-6">ПОЧЕМУ ДЕВЯНОСТЫЕ НЕ ОТПУСКАЮТ</p>
             <div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
@@ -296,8 +370,10 @@
 
     <!-- О проекте и доставке -->
     <div id="info-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
-            <button onclick="window.closeInfoModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20">
+            <button onclick="window.closeInfoModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="text-white font-impact text-3xl mb-6 uppercase">О ПРОЕКТЕ И ДОСТАВКЕ</h3>
             <div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
                 <p><strong class="text-white">KOSHEI SHMOT</strong> — независимый бренд из <strong class="text-white">Калининграда</strong>. Мы создаем вещи, пропитанные духом отечественного кинематографа 90-х и нулевых («Брат», «Бумер», «Жмурки», «Сёстры»).</p>
@@ -316,8 +392,10 @@
 
     <!-- Галерея лукбука -->
     <div id="looks-gallery-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
-            <button onclick="window.closeLooksGalleryModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20">
+            <button onclick="window.closeLooksGalleryModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">УЛИЧНАЯ ХРОНИКА / ЛУКБУК</h3>
             <p class="tech-text text-koshei-red mb-6">ФОТО И ЦИТАТЫ НАШИХ ЛЮДЕЙ</p>
             <div id="looks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -326,8 +404,10 @@
 
     <!-- Добавить лук -->
     <div id="look-submit-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-md relative">
-            <button onclick="window.closeLookModal()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-md relative pt-20">
+            <button onclick="window.closeLookModal()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="font-impact text-2xl text-white mb-2 uppercase">ДОБАВИТЬ В ЛУКБУК</h3>
             <p class="tech-text text-koshei-red mb-6">ФОТО ПРОЙДЕТ ПРОВЕРКУ АДМИНИСТРАТОРОМ</p>
             <form id="look-form" onsubmit="window.submitLook(event)" class="space-y-4">
@@ -341,8 +421,10 @@
 
     <!-- Сетка размеров -->
     <div id="size-guide-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/90">
-        <div class="bg-[#050505] border border-[#333] p-6 w-full max-w-md relative">
-            <button onclick="window.closeSizeGuide()" class="absolute top-4 right-4 text-[#666] hover:text-white text-2xl p-2 focus:outline-none cursor-pointer"><i class="fas fa-times"></i></button>
+        <div class="bg-[#050505] border border-[#333] p-6 w-full max-w-md relative pt-20">
+            <button onclick="window.closeSizeGuide()" class="close-btn-super">
+                <i class="fas fa-times"></i>
+            </button>
             <h3 class="text-white font-impact text-xl mb-4 text-center uppercase">СЕТКА РАЗМЕРОВ</h3>
             <table class="w-full text-xs text-left border border-[#333] text-[#ccc]">
                 <tr class="bg-[#111]"><th class="border border-[#333] p-2">Размер</th><th class="border border-[#333] p-2">Грудь (см)</th><th class="border border-[#333] p-2">Длина (см)</th></tr>
@@ -355,463 +437,441 @@
     </div>
 
     <!-- Всплывающее уведомление -->
-    <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[200] bg-white text-black font-bold uppercase text-[10px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl pointer-events-none">
+    <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[300] bg-white text-black font-bold uppercase text-[12px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl pointer-events-none rounded-full">
         <i class="fas fa-check"></i> <span id="toast-msg">ДОБАВЛЕНО</span>
     </div>
 
+    <!-- ГЛАВНЫЙ СКРИПТ -->
     <script>
-        // ГЛОБАЛЬНЫЕ КНОПКИ (Работают ВСЕГДА, даже до загрузки скрипта БД)
-        window.openMenu = () => { const m = document.getElementById('menu-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
-        window.closeMenu = () => { const m = document.getElementById('menu-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+        // Инициализация базы данных и ключей по умолчанию
+        let JSONBIN_BIN_ID = localStorage.getItem('koshei_main_bin_id') || "6ad4d653ac6210605a3c4912";
+        let JSONBIN_ACCESS_KEY = localStorage.getItem('koshei_main_access_key') || "$2a$10$HHmF6ZgWCnPVqG9Ggxp/EOBYkZiG5pocHmYToVmlv/I66cdgwqaQy";
+
+        window.state = {
+            products: [], films: [], looks: [], pendingLooks: [], cart: [],
+            promoCode: '', promoDiscount: 0, telegramUsername: "KOSHEI_SUPPORT", 
+            searchQuery: "", currentFilmSlide: 0, activeProductId: null, promos: {}
+        };
+
+        let filmInterval = null;
+
+        // ГЛОБАЛЬНЫЕ КНОПКИ (МОДАЛКИ)
+        window.openMenu = () => { document.getElementById('menu-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeMenu = () => { document.getElementById('menu-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openCart = () => { const modal = document.getElementById('cart-modal'); if(modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderCartContents(); } };
-        window.closeCart = () => { const modal = document.getElementById('cart-modal'); if(modal) { modal.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openCart = () => { document.getElementById('cart-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.renderCartContents(); };
+        window.closeCart = () => { document.getElementById('cart-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openMusicModal = () => { window.closeMenu(); const m = document.getElementById('music-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
-        window.closeMusicModal = () => { const m = document.getElementById('music-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openMusicModal = () => { window.closeMenu(); document.getElementById('music-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeMusicModal = () => { document.getElementById('music-modal').classList.add('hidden'); document.body.style.overflow = ''; };
+
+        // НОВЫЙ МОДАЛ: ПЛЕЙЛИСТ
+        window.openPlaylistModal = () => { window.closeMenu(); document.getElementById('playlist-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closePlaylistModal = () => { document.getElementById('playlist-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openArchiveModal = () => { window.closeMenu(); const m = document.getElementById('archive-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
-        window.closeArchiveModal = () => { const m = document.getElementById('archive-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openArchiveModal = () => { window.closeMenu(); document.getElementById('archive-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeArchiveModal = () => { document.getElementById('archive-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openLooksGalleryModal = () => { window.closeMenu(); const m = document.getElementById('looks-gallery-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderLooks(); } };
-        window.closeLooksGalleryModal = () => { const m = document.getElementById('looks-gallery-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openLooksGalleryModal = () => { window.closeMenu(); document.getElementById('looks-gallery-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.renderLooks(); };
+        window.closeLooksGalleryModal = () => { document.getElementById('looks-gallery-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openLookModal = () => { window.closeMenu(); const m = document.getElementById('look-submit-modal'); if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
-        window.closeLookModal = () => { window.closeMenu(); const m = document.getElementById('look-submit-modal'); if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openLookModal = () => { window.closeMenu(); document.getElementById('look-submit-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeLookModal = () => { document.getElementById('look-submit-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openInfoModal = () => { window.closeMenu(); const modal = document.getElementById('info-modal'); if(modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; } };
-        window.closeInfoModal = () => { const modal = document.getElementById('info-modal'); if(modal) { modal.classList.add('hidden'); document.body.style.overflow = ''; } };
+        window.openInfoModal = () => { window.closeMenu(); document.getElementById('info-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeInfoModal = () => { document.getElementById('info-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openSizeGuide = () => { const modal = document.getElementById('size-guide-modal'); if(modal) modal.classList.remove('hidden'); };
-        window.closeSizeGuide = () => { const modal = document.getElementById('size-guide-modal'); if(modal) modal.classList.add('hidden'); };
+        window.openSizeGuide = () => { document.getElementById('size-guide-modal').classList.remove('hidden'); };
+        window.closeSizeGuide = () => { document.getElementById('size-guide-modal').classList.add('hidden'); };
         
         window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden'); document.body.style.overflow = ''; window.state.activeProductId = null; };
 
-        // Инициализация базы и логики
         document.addEventListener('DOMContentLoaded', () => {
-            try {
-                // Вшиваем твои ключи по умолчанию
-                let JSONBIN_BIN_ID = localStorage.getItem('koshei_main_bin_id') || "6ad4d653ac6210605a3c4912";
-                let JSONBIN_ACCESS_KEY = localStorage.getItem('koshei_main_access_key') || "$2a$10$HHmF6ZgWCnPVqG9Ggxp/EOBYkZiG5pocHmYToVmlv/I66cdgwqaQy";
+            function getDefaultFilms() {
+                return [
+                    { id: 'bumer', tag: 'BMR', title: 'БУМЕР', desc: 'Чёрный BMW, ночная трасса, свобода.', quote: '«Не мы такие — жизнь такая.»', author: 'ПЁТР БУСЛОВ — 2003', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BUMER&font=Oswald' },
+                    { id: 'brat', tag: 'BRT', title: 'БРАТ', desc: 'Питер, дожди, кассета Nautilus.', quote: '«В чём сила, брат?»', author: 'АЛЕКСЕЙ БАЛАБАНОВ — 1997', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BRAT&font=Oswald' }
+                ];
+            }
 
-                window.state = {
-                    products: [], films: [], looks: [], pendingLooks: [], cart: [],
-                    promoCode: '', promoDiscount: 0, telegramUsername: "KOSHEI_SUPPORT", 
-                    searchQuery: "", currentFilmSlide: 0, activeProductId: null, promos: {}
-                };
-
-                let filmInterval = null;
-
-                function getDefaultFilms() {
-                    return [
-                        { id: 'bumer', tag: 'BMR', title: 'БУМЕР', desc: 'Чёрный BMW, ночная трасса, свобода.', quote: '«Не мы такие — жизнь такая.»', author: 'ПЁТР БУСЛОВ — 2003', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BUMER&font=Oswald' },
-                        { id: 'brat', tag: 'BRT', title: 'БРАТ', desc: 'Питер, дожди, кассета Nautilus.', quote: '«В чём сила, брат?»', author: 'АЛЕКСЕЙ БАЛАБАНОВ — 1997', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BRAT&font=Oswald' }
-                    ];
+            window.checkSecretPin = () => {
+                const val = document.getElementById('secret-pin-input').value.trim();
+                if(val === '9812') {
+                    document.getElementById('pin-entry-box').classList.add('hidden');
+                    document.getElementById('keys-entry-box').classList.remove('hidden');
+                    document.getElementById('settings-bin-id').value = JSONBIN_BIN_ID;
+                    document.getElementById('settings-access-key').value = JSONBIN_ACCESS_KEY;
+                } else {
+                    alert("Неверный код!");
                 }
+            };
 
-                // Секретные настройки в меню
-                window.checkSecretPin = () => {
-                    const val = document.getElementById('secret-pin-input').value.trim();
-                    if(val === '9812') {
-                        document.getElementById('pin-entry-box').classList.add('hidden');
-                        document.getElementById('keys-entry-box').classList.remove('hidden');
-                        document.getElementById('settings-bin-id').value = JSONBIN_BIN_ID;
-                        document.getElementById('settings-access-key').value = JSONBIN_ACCESS_KEY;
-                    } else {
-                        alert("Неверный код доступа!");
-                    }
-                };
-
-                window.saveSecretKeys = () => {
-                    const bId = document.getElementById('settings-bin-id').value.trim();
-                    const aKey = document.getElementById('settings-access-key').value.trim();
-                    if(bId && aKey) {
-                        localStorage.setItem('koshei_main_bin_id', bId);
-                        localStorage.setItem('koshei_main_access_key', aKey);
-                        localStorage.setItem('koshei_keys_configured', 'true');
-                        JSONBIN_BIN_ID = bId; JSONBIN_ACCESS_KEY = aKey;
-                        alert("Связь с базой успешно установлена!");
-                        window.closeSecretKeysModal();
-                        checkKeysConfiguredState();
-                        loadCloudData();
-                    }
-                };
-
-                window.openSecretKeysModal = () => {
-                    window.closeMenu();
-                    const m = document.getElementById('secret-keys-modal');
-                    if(m) {
-                        m.classList.remove('hidden'); document.body.style.overflow = 'hidden';
-                        document.getElementById('pin-entry-box').classList.remove('hidden');
-                        document.getElementById('keys-entry-box').classList.add('hidden');
-                        document.getElementById('secret-pin-input').value = '';
-                    }
-                };
-
-                window.closeSecretKeysModal = () => {
-                    const m = document.getElementById('secret-keys-modal');
-                    if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
-                };
-
-                function checkKeysConfiguredState() {
-                    const configured = localStorage.getItem('koshei_keys_configured');
-                    const wrap = document.getElementById('secret-keys-menu-btn-wrap');
-                    if (configured === 'true' && wrap) { wrap.style.display = 'none'; } // Прячем навсегда
-                }
-
-                async function loadCloudData() {
-                    try {
-                        const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                            method: 'GET',
-                            headers: { 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY }
-                        });
-                        
-                        if(res.ok) {
-                            const json = await res.json();
-                            const data = json.record || {};
-                            window.state.products = data.products || [];
-                            window.state.films = (data.films && data.films.length > 0) ? data.films : getDefaultFilms();
-                            window.state.promos = data.promos || {};
-                            window.state.looks = data.looks || [];
-                            window.state.pendingLooks = data.pendingLooks || [];
-                        } else {
-                            window.state.films = getDefaultFilms();
-                        }
-                    } catch(e) {
-                        console.error("Ошибка БД", e);
-                        window.state.films = getDefaultFilms();
-                    }
-                    renderAll();
-                }
-
-                function renderAll() { 
-                    try { renderProducts(); } catch(e) {}
-                    try { renderFilmSlide(); } catch(e) {}
-                    try { renderCartUI(); } catch(e) {}
-                    try { renderLooks(); } catch(e) {}
-                    setupSwipeListeners();
-                    resetAutoPlay();
+            window.saveSecretKeys = () => {
+                const bId = document.getElementById('settings-bin-id').value.trim();
+                const aKey = document.getElementById('settings-access-key').value.trim();
+                if(bId && aKey) {
+                    localStorage.setItem('koshei_main_bin_id', bId);
+                    localStorage.setItem('koshei_main_access_key', aKey);
+                    localStorage.setItem('koshei_keys_configured', 'true');
+                    JSONBIN_BIN_ID = bId; JSONBIN_ACCESS_KEY = aKey;
+                    alert("Ключи сохранены! База подключена.");
+                    window.closeSecretKeysModal();
                     checkKeysConfiguredState();
+                    loadCloudData();
                 }
+            };
 
-                window.handleSearch = (e) => { window.state.searchQuery = (e.target.value || '').toLowerCase(); renderProducts(); }
-                window.nextFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide + 1) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
-                window.prevFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide - 1 + window.state.films.length) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
+            window.openSecretKeysModal = () => {
+                window.closeMenu();
+                document.getElementById('secret-keys-modal').classList.remove('hidden'); 
+                document.body.style.overflow = 'hidden';
+                document.getElementById('pin-entry-box').classList.remove('hidden');
+                document.getElementById('keys-entry-box').classList.add('hidden');
+                document.getElementById('secret-pin-input').value = '';
+            };
 
-                function resetAutoPlay() {
-                    if (filmInterval) clearInterval(filmInterval);
-                    filmInterval = setInterval(() => { window.nextFilm(); }, 5000);
-                }
+            window.closeSecretKeysModal = () => {
+                document.getElementById('secret-keys-modal').classList.add('hidden'); document.body.style.overflow = '';
+            };
 
-                function setupSwipeListeners() {
-                    const filmArea = document.getElementById('film-strip-area');
-                    if (!filmArea) return;
-                    let touchstartX = 0; let touchendX = 0;
-                    filmArea.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-                    filmArea.addEventListener('touchend', e => {
-                        touchendX = e.changedTouches[0].screenX;
-                        if (touchendX < touchstartX - 40) window.nextFilm(); 
-                        if (touchendX > touchstartX + 40) window.prevFilm(); 
-                    }, {passive: true});
-                }
+            function checkKeysConfiguredState() {
+                const configured = localStorage.getItem('koshei_keys_configured');
+                const wrap = document.getElementById('secret-keys-menu-btn-wrap');
+                if (configured === 'true' && wrap) { wrap.style.display = 'none'; } 
+            }
 
-                function renderFilmSlide() {
-                    if(!window.state.films || window.state.films.length === 0) return;
-                    const film = window.state.films[window.state.currentFilmSlide];
-                    if(!film) return;
-                    
-                    const count = `${String(window.state.currentFilmSlide + 1).padStart(2, '0')} / ${String(window.state.films.length).padStart(2, '0')}`;
-                    const authorSplit = (film.author || '').split('—')[1];
-                    
-                    const els = {
-                        img: document.getElementById('hero-film-img'), counter1: document.getElementById('hero-film-counter'),
-                        year: document.getElementById('hero-film-year'), titleOver: document.getElementById('hero-film-title-overlay'),
-                        tag: document.getElementById('strip-tag'), title: document.getElementById('strip-title'),
-                        desc: document.getElementById('strip-desc'), quote: document.getElementById('strip-quote'),
-                        author: document.getElementById('strip-author')
-                    };
-
-                    if(els.img) els.img.src = film.img || `https://placehold.co/1200x600/050505/111?text=KOSHEI`;
-                    if(els.counter1) els.counter1.innerText = `КАДР ${count}`;
-                    if(els.year) els.year.innerText = `ПАМЯТИ КИНО — ${authorSplit ? authorSplit.trim() : '90-Е'}`;
-                    if(els.titleOver) { els.titleOver.innerText = film.title || ''; els.titleOver.classList.remove('fade-in'); void els.titleOver.offsetWidth; els.titleOver.classList.add('fade-in'); }
-                    if(els.tag) els.tag.innerText = film.tag || 'KSH';
-                    if(els.title) els.title.innerText = film.title || '';
-                    if(els.desc) els.desc.innerText = film.desc || '';
-                    if(els.quote) els.quote.innerText = film.quote || '';
-                    if(els.author) els.author.innerText = film.author || '';
-                }
-
-                function renderProducts() {
-                    const grid = document.getElementById('products-grid');
-                    const emptyState = document.getElementById('empty-state');
-                    const countLabel = document.getElementById('catalog-count');
-                    if(!grid) return;
-
-                    // Безопасный фильтр (если случайно создали товар без имени)
-                    const filtered = window.state.products.filter(p => {
-                        const title = (p.title || '').toLowerCase();
-                        const film = (p.film || '').toLowerCase();
-                        return title.includes(window.state.searchQuery) || film.includes(window.state.searchQuery);
+            async function loadCloudData() {
+                try {
+                    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                        method: 'GET',
+                        headers: { 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY }
                     });
                     
-                    if(countLabel) countLabel.innerText = `${filtered.length} ПРЕДМЕТОВ / АРХИВ ПРИНТОВ`;
-
-                    if (filtered.length === 0) {
-                        grid.innerHTML = '';
-                        if(emptyState) {
-                            emptyState.innerHTML = '<h3 class="font-bold text-lg uppercase text-white mb-2">ПОКА ПУСТО...</h3><p class="text-[#666] text-sm">В каталоге еще нет добавленных вещей.</p>';
-                            emptyState.classList.remove('hidden');
-                        }
-                        return;
-                    }
-
-                    if(emptyState) emptyState.classList.add('hidden');
-                    grid.innerHTML = filtered.map(p => {
-                        let badgeHtml = '';
-                        if(p.badge === 'NEW') badgeHtml = `<div class="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2 py-1 z-20">НОВИНКА</div>`;
-                        else if(p.badge === 'SOLD OUT') badgeHtml = `<div class="absolute top-3 right-3 bg-koshei-red text-white text-[10px] font-bold px-2 py-1 z-20">SOLD OUT</div>`;
-
-                        const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/800x1000/0A0A0A/E51A1A?text=NO+IMAGE';
-                        return `
-                        <div class="group cursor-pointer relative fade-in" onclick="window.openProductModal('${p.id}')">
-                            ${badgeHtml}
-                            <div class="relative aspect-[3/4] bg-[#0A0A0A] border border-[#222] overflow-hidden mb-3">
-                                <div class="absolute top-3 left-3 bg-[#111] border border-[#333] px-2 py-1 tech-text text-white z-10">${p.film || 'КАТАЛОГ'}</div>
-                                <img src="${mainImg}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-                            </div>
-                            <div class="flex justify-between items-baseline mb-1">
-                                <h3 class="font-bold text-sm uppercase tracking-wide truncate pr-2 w-3/4">${p.title || 'Вещь'}</h3>
-                                <span class="text-sm font-bold whitespace-nowrap">${p.price || 0} ₽</span>
-                            </div>
-                            <div class="flex justify-between items-center tech-text">
-                                <span class="text-[#666] truncate w-2/3">${(p.sizes || 'S / M / L').replace(/,/g, ' / ')}</span>
-                                <span class="text-koshei-red group-hover:text-white transition-colors">СМОТРЕТЬ -></span>
-                            </div>
-                        </div>`
-                    }).join('');
-                }
-
-                function renderLooks() {
-                    const grid = document.getElementById('looks-grid');
-                    if(!grid) return;
-                    if(!window.state.looks || window.state.looks.length === 0) {
-                        grid.innerHTML = '<div class="col-span-full text-center py-8 tech-text text-[#666]">ПОКА НЕТ ФОТО В ЛУКБУКЕ. БУДЬ ПЕРВЫМ!</div>'; return;
-                    }
-                    grid.innerHTML = window.state.looks.map(l => `
-                        <div class="bg-[#0A0A0A] border border-[#222] overflow-hidden flex flex-col">
-                            <div class="aspect-[4/5] bg-black overflow-hidden relative"><img src="${l.img}" class="w-full h-full object-cover"></div>
-                            <div class="p-4 flex flex-col justify-between flex-grow">
-                                <p class="text-xs text-white mb-3 italic">«${l.msg || ''}»</p>
-                                <div class="tech-text text-koshei-red">— ${l.author || 'СВОЙ'}</div>
-                            </div>
-                        </div>`).join('');
-                }
-
-                window.submitLook = async (e) => {
-                    e.preventDefault();
-                    const btn = e.target.querySelector('button[type="submit"]');
-                    btn.innerText = "ОТПРАВЛЯЕМ..."; btn.disabled = true;
-
-                    const img = document.getElementById('look-img').value.trim();
-                    const msg = document.getElementById('look-msg').value.trim();
-                    const author = document.getElementById('look-author').value.trim() || 'Аноним';
-
-                    if(!img || !msg) { alert("Заполните ссылку на фото и сообщение!"); btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false; return; }
-                    const newLook = { id: Date.now(), img, msg, author };
-                    
-                    try {
-                        const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                            method: 'GET', headers: { 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY }
-                        });
-                        
-                        if(res.ok) {
-                            const json = await res.json();
-                            const data = json.record || {};
-                            if(!data.pendingLooks) data.pendingLooks = [];
-                            data.pendingLooks.push(newLook); 
-
-                            const putRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY },
-                                body: JSON.stringify(data)
-                            });
-
-                            if(putRes.ok) {
-                                alert("Фото успешно отправлено на проверку!");
-                                document.getElementById('look-form').reset();
-                                window.closeLookModal();
-                            } else {
-                                alert("Ошибка базы данных при отправке.");
-                            }
-                        }
-                    } catch(err) { alert("Ошибка сети."); }
-                    btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false;
-                }
-
-                let currentGalleryIndex = 0; let currentProductMedia = [];
-
-                window.openProductModal = (id) => {
-                    const product = window.state.products.find(p => p.id === id);
-                    if(!product) return;
-                    window.state.activeProductId = id;
-
-                    document.getElementById('pm-film').innerText = `${product.film || 'КАТАЛОГ'} / КОЛЛЕКЦИЯ`;
-                    document.getElementById('pm-title').innerText = product.title || '';
-                    document.getElementById('pm-price').innerText = `${product.price || 0} ₽`;
-                    document.getElementById('pm-desc').innerText = product.desc || '';
-
-                    currentProductMedia = [];
-                    if(product.images && product.images.length > 0) product.images.forEach(img => currentProductMedia.push({ type: 'image', src: img }));
-                    currentGalleryIndex = 0; window.renderGallery();
-
-                    const sizesArr = (product.sizes || 'S,M,L,XL').split(',').map(s => s.trim());
-                    document.getElementById('pm-sizes').innerHTML = sizesArr.map(s => `<button onclick="window.selectSize(this, '${s}')" class="size-btn w-10 h-10 border border-[#333] flex items-center justify-center text-xs hover:border-white transition-colors focus:outline-none">${s}</button>`).join('');
-                    
-                    const btn = document.getElementById('pm-add-btn');
-                    if(product.badge === 'SOLD OUT') {
-                        btn.innerText = 'НЕТ В НАЛИЧИИ'; btn.classList.add('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.remove('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = true;
+                    if(res.ok) {
+                        const json = await res.json();
+                        const data = json.record || {};
+                        window.state.products = data.products || [];
+                        window.state.films = (data.films && data.films.length > 0) ? data.films : getDefaultFilms();
+                        window.state.promos = data.promos || {};
+                        window.state.looks = data.looks || [];
+                        window.state.pendingLooks = data.pendingLooks || [];
                     } else {
-                        btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.add('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = false;
+                        window.state.films = getDefaultFilms();
                     }
-                    document.getElementById('product-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.selectedSize = null;
+                } catch(e) {
+                    window.state.films = getDefaultFilms();
                 }
-
-                window.renderGallery = () => {
-                    if(currentProductMedia.length === 0) return;
-                    const media = currentProductMedia[currentGalleryIndex];
-                    document.getElementById('pm-main-media').innerHTML = `<img src="${media.src}" class="w-full h-full object-cover">`;
-                    const thumbsContainer = document.getElementById('pm-thumbnails');
-                    if(currentProductMedia.length > 1) {
-                        thumbsContainer.innerHTML = currentProductMedia.map((m, idx) => {
-                            const border = idx === currentGalleryIndex ? 'border-white' : 'border-[#333]';
-                            return `<div onclick="window.setGalleryIndex(${idx})" class="w-16 h-20 border ${border} cursor-pointer opacity-80 hover:opacity-100 transition-all"><img src="${m.src}" class="w-full h-full object-cover"></div>`;
-                        }).join('');
-                    } else { thumbsContainer.innerHTML = ''; }
-                }
-
-                window.setGalleryIndex = (idx) => { currentGalleryIndex = idx; window.renderGallery(); }
-                
-                window.selectSize = (btnElement, size) => {
-                    document.querySelectorAll('.size-btn').forEach(b => { b.classList.remove('border-white', 'bg-white', 'text-black'); b.classList.add('border-[#333]', 'text-white'); });
-                    btnElement.classList.remove('border-[#333]', 'text-white'); btnElement.classList.add('border-white', 'bg-white', 'text-black');
-                    window.selectedSize = size;
-                }
-
-                window.addToCart = () => {
-                    const product = window.state.products.find(p => p.id === window.state.activeProductId);
-                    if(!product || product.badge === 'SOLD OUT') return;
-                    const size = window.selectedSize || (product.sizes ? product.sizes.split(',')[0].trim() : 'M'); 
-                    const existing = window.state.cart.find(item => item.id === product.id && item.size === size);
-                    if(existing) existing.qty += 1;
-                    else window.state.cart.push({ id: product.id, title: product.title, price: Number(product.price), size: size, qty: 1, img: product.images[0] });
-                    renderCartUI(); window.showToast('ДОБАВЛЕНО В КОРЗИНУ'); window.closeProductModal();
-                }
-
-                window.removeFromCart = (idx) => { window.state.cart.splice(idx, 1); window.renderCartContents(); renderCartUI(); }
-
-                function renderCartUI() {
-                    const totalQty = window.state.cart.reduce((sum, item) => sum + item.qty, 0);
-                    const cartBadge = document.getElementById('header-cart-count');
-                    const floatBtn = document.getElementById('floating-cart-btn');
-                    const floatCnt = document.getElementById('floating-cart-count');
-
-                    if(totalQty > 0) {
-                        if(cartBadge) { cartBadge.innerText = totalQty; cartBadge.classList.remove('hidden'); }
-                        if(floatBtn) floatBtn.classList.remove('hidden');
-                        if(floatCnt) floatCnt.innerText = totalQty;
-                    } else {
-                        if(cartBadge) cartBadge.classList.add('hidden');
-                        if(floatBtn) floatBtn.classList.add('hidden');
-                    }
-                }
-
-                window.applyPromo = () => {
-                    const codeInput = document.getElementById('promo-input');
-                    if(!codeInput) return;
-                    const code = codeInput.value.trim().toUpperCase();
-
-                    if (localStorage.getItem('used_promo_' + code)) {
-                        window.state.promoCode = ''; window.state.promoDiscount = 0;
-                        document.getElementById('promo-msg').innerHTML = `<span class="text-koshei-red">Вы уже использовали этот код!</span>`; window.renderCartContents(); return;
-                    }
-
-                    if(window.state.promos && window.state.promos[code]) {
-                        window.state.promoCode = code; window.state.promoDiscount = window.state.promos[code];
-                        document.getElementById('promo-msg').innerHTML = `<span class="text-green-500">Применен (-${window.state.promoDiscount*100}%)</span>`;
-                    } else {
-                        window.state.promoCode = ''; window.state.promoDiscount = 0;
-                        document.getElementById('promo-msg').innerHTML = `<span class="text-koshei-red">Неверный код</span>`;
-                    }
-                    window.renderCartContents();
-                }
-
-                window.renderCartContents = () => {
-                    const list = document.getElementById('cart-items');
-                    const totalEl = document.getElementById('cart-total');
-                    const checkoutBtn = document.getElementById('checkout-btn');
-                    if(!list) return;
-
-                    if(window.state.cart.length === 0) {
-                        list.innerHTML = '<div class="text-center py-10 tech-text text-[#666]">КОРЗИНА ПУСТА</div>';
-                        if(totalEl) totalEl.innerText = '0 ₽';
-                        if(checkoutBtn) checkoutBtn.classList.add('opacity-50', 'pointer-events-none');
-                        return;
-                    }
-                    if(checkoutBtn) checkoutBtn.classList.remove('opacity-50', 'pointer-events-none');
-
-                    list.innerHTML = window.state.cart.map((item, idx) => `
-                        <div class="flex gap-4 items-center border-b border-[#222] pb-4 mb-4 last:border-0">
-                            <img src="${item.img}" class="w-16 h-20 object-cover border border-[#333]">
-                            <div class="flex-grow">
-                                <div class="text-xs font-bold uppercase text-white leading-tight">${item.title}</div>
-                                <div class="tech-text text-[#888] mt-1">РАЗМЕР: ${item.size} | КОЛ-ВО: ${item.qty}</div>
-                                <div class="text-sm font-bold text-white mt-1">${item.price * item.qty} ₽</div>
-                            </div>
-                            <button onclick="window.removeFromCart(${idx})" class="text-[#666] hover:text-koshei-red w-8 h-8 flex items-center justify-center text-xl"><i class="fas fa-times"></i></button>
-                        </div>
-                    `).join('');
-
-                    const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                    const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
-
-                    let totalHtml = `СУММА: ${subtotal} ₽`;
-                    if(window.state.promoDiscount > 0) totalHtml = `<span class="line-through text-[#666] mr-2">${subtotal} ₽</span> <span class="text-koshei-red">${finalTotal} ₽</span>`;
-                    if(totalEl) totalEl.innerHTML = totalHtml;
-                }
-
-                window.checkoutCart = () => {
-                    if(window.state.cart.length === 0) return;
-                    const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                    const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
-                    
-                    let msg = `🔥 НОВЫЙ ЗАКАЗ 🔥\n\n`;
-                    window.state.cart.forEach((item, i) => { msg += `${i+1}) ${item.title}\nРазмер: ${item.size} — ${item.qty} шт. x ${item.price}₽\n`; });
-                    msg += `\nСумма: ${subtotal} ₽`;
-                    
-                    if(window.state.promoCode) { msg += `\nПромокод: ${window.state.promoCode} (-${window.state.promoDiscount*100}%)`; localStorage.setItem('used_promo_' + window.state.promoCode, 'true'); }
-                    msg += `\nИТОГО К ОПЛАТЕ: ${finalTotal} ₽`;
-
-                    const url = `https://t.me/${window.state.telegramUsername}?text=${encodeURIComponent(msg)}`;
-                    const link = document.createElement('a'); link.href = url; link.target = '_blank'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    
-                    window.state.cart = []; window.state.promoCode = ''; window.state.promoDiscount = 0; 
-                    window.renderCartContents(); renderCartUI(); window.closeCart();
-                }
-
-                window.showToast = (msg) => {
-                    const toast = document.getElementById('custom-toast'); const toastMsg = document.getElementById('toast-msg');
-                    if(!toast || !toastMsg) return;
-                    toastMsg.innerText = msg; toast.classList.remove('translate-y-[200%]', 'opacity-0');
-                    setTimeout(() => toast.classList.add('translate-y-[200%]', 'opacity-0'), 3000);
-                }
-
-                // Запуск после загрузки DOM
-                loadCloudData();
-                
-            } catch(globalError) {
-                console.error("Критическая ошибка скрипта:", globalError);
+                renderAll();
             }
+
+            function renderAll() { 
+                renderProducts();
+                renderFilmSlide();
+                renderCartUI();
+                setupSwipeListeners();
+                resetAutoPlay();
+                checkKeysConfiguredState();
+            }
+
+            window.handleSearch = (e) => { window.state.searchQuery = (e.target.value || '').toLowerCase(); renderProducts(); }
+            window.nextFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide + 1) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
+            window.prevFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide - 1 + window.state.films.length) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
+
+            function resetAutoPlay() {
+                if (filmInterval) clearInterval(filmInterval);
+                filmInterval = setInterval(() => { window.nextFilm(); }, 5000);
+            }
+
+            function setupSwipeListeners() {
+                const filmArea = document.getElementById('film-strip-area');
+                if (!filmArea) return;
+                let touchstartX = 0; let touchendX = 0;
+                filmArea.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+                filmArea.addEventListener('touchend', e => {
+                    touchendX = e.changedTouches[0].screenX;
+                    if (touchendX < touchstartX - 40) window.nextFilm(); 
+                    if (touchendX > touchstartX + 40) window.prevFilm(); 
+                }, {passive: true});
+            }
+
+            function renderFilmSlide() {
+                if(!window.state.films || window.state.films.length === 0) return;
+                const film = window.state.films[window.state.currentFilmSlide];
+                if(!film) return;
+                
+                const count = `${String(window.state.currentFilmSlide + 1).padStart(2, '0')} / ${String(window.state.films.length).padStart(2, '0')}`;
+                const authorSplit = (film.author || '').split('—')[1];
+                
+                document.getElementById('hero-film-img').src = film.img || `https://placehold.co/1200x600/050505/111?text=KOSHEI`;
+                document.getElementById('hero-film-counter').innerText = `КАДР ${count}`;
+                document.getElementById('hero-film-year').innerText = `ПАМЯТИ КИНО — ${authorSplit ? authorSplit.trim() : '90-Е'}`;
+                
+                const titleOver = document.getElementById('hero-film-title-overlay');
+                titleOver.innerText = film.title || ''; titleOver.classList.remove('fade-in'); void titleOver.offsetWidth; titleOver.classList.add('fade-in');
+                
+                document.getElementById('strip-tag').innerText = film.tag || 'KSH';
+                document.getElementById('strip-title').innerText = film.title || '';
+                document.getElementById('strip-desc').innerText = film.desc || '';
+                document.getElementById('strip-quote').innerText = film.quote || '';
+                document.getElementById('strip-author').innerText = film.author || '';
+            }
+
+            function renderProducts() {
+                const grid = document.getElementById('products-grid');
+                const emptyState = document.getElementById('empty-state');
+                const countLabel = document.getElementById('catalog-count');
+                
+                const filtered = window.state.products.filter(p => {
+                    const title = (p.title || '').toLowerCase();
+                    const film = (p.film || '').toLowerCase();
+                    return title.includes(window.state.searchQuery) || film.includes(window.state.searchQuery);
+                });
+                
+                if(countLabel) countLabel.innerText = `${filtered.length} ПРЕДМЕТОВ / АРХИВ ПРИНТОВ`;
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    if(emptyState) emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                if(emptyState) emptyState.classList.add('hidden');
+                grid.innerHTML = filtered.map(p => {
+                    let badgeHtml = '';
+                    if(p.badge === 'NEW') badgeHtml = `<div class="absolute top-3 right-3 bg-white text-black text-[12px] font-bold px-3 py-1 z-20 shadow-md">НОВИНКА</div>`;
+                    else if(p.badge === 'SOLD OUT') badgeHtml = `<div class="absolute top-3 right-3 bg-koshei-red text-white text-[12px] font-bold px-3 py-1 z-20 shadow-md">SOLD OUT</div>`;
+
+                    const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/800x1000/0A0A0A/E51A1A?text=NO+IMAGE';
+                    return `
+                    <div class="group cursor-pointer relative fade-in" onclick="window.openProductModal('${p.id}')">
+                        ${badgeHtml}
+                        <div class="relative aspect-[3/4] bg-[#0A0A0A] border border-[#222] overflow-hidden mb-3">
+                            <div class="absolute top-3 left-3 bg-[#111]/80 backdrop-blur-sm border border-[#333] px-2 py-1 tech-text text-white z-10">${p.film || 'КАТАЛОГ'}</div>
+                            <img src="${mainImg}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+                        </div>
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h3 class="font-bold text-sm uppercase tracking-wide truncate pr-2 w-3/4">${p.title || 'Вещь'}</h3>
+                            <span class="text-sm font-bold whitespace-nowrap text-koshei-red">${p.price || 0} ₽</span>
+                        </div>
+                        <div class="flex justify-between items-center tech-text">
+                            <span class="text-[#666] truncate w-2/3">${(p.sizes || 'S / M / L').replace(/,/g, ' / ')}</span>
+                            <span class="text-white group-hover:text-koshei-red transition-colors">СМОТРЕТЬ -></span>
+                        </div>
+                    </div>`
+                }).join('');
+            }
+
+            window.renderLooks = () => {
+                const grid = document.getElementById('looks-grid');
+                if(!window.state.looks || window.state.looks.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-8 tech-text text-[#666]">ПОКА НЕТ ФОТО В ЛУКБУКЕ. БУДЬ ПЕРВЫМ!</div>'; return;
+                }
+                grid.innerHTML = window.state.looks.map(l => `
+                    <div class="bg-[#0A0A0A] border border-[#222] overflow-hidden flex flex-col">
+                        <div class="aspect-[4/5] bg-black overflow-hidden relative"><img src="${l.img}" class="w-full h-full object-cover"></div>
+                        <div class="p-4 flex flex-col justify-between flex-grow">
+                            <p class="text-sm text-white mb-3 italic">«${l.msg || ''}»</p>
+                            <div class="tech-text text-koshei-red">— ${l.author || 'СВОЙ'}</div>
+                        </div>
+                    </div>`).join('');
+            }
+
+            window.submitLook = async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.innerText = "ОТПРАВЛЯЕМ..."; btn.disabled = true;
+
+                const img = document.getElementById('look-img').value.trim();
+                const msg = document.getElementById('look-msg').value.trim();
+                const author = document.getElementById('look-author').value.trim() || 'Аноним';
+
+                if(!img || !msg) { alert("Заполните ссылку на фото и сообщение!"); btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false; return; }
+                const newLook = { id: Date.now(), img, msg, author };
+                
+                try {
+                    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                        method: 'GET', headers: { 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY }
+                    });
+                    
+                    if(res.ok) {
+                        const json = await res.json();
+                        const data = json.record || {};
+                        if(!data.pendingLooks) data.pendingLooks = [];
+                        data.pendingLooks.push(newLook); 
+
+                        const putRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_ACCESS_KEY, 'X-Access-Key': JSONBIN_ACCESS_KEY },
+                            body: JSON.stringify(data)
+                        });
+
+                        if(putRes.ok) {
+                            alert("Фото успешно отправлено на проверку!");
+                            document.getElementById('look-form').reset();
+                            window.closeLookModal();
+                        } else { alert("Ошибка базы данных при отправке."); }
+                    }
+                } catch(err) { alert("Ошибка сети."); }
+                btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false;
+            }
+
+            let currentGalleryIndex = 0; let currentProductMedia = [];
+
+            window.openProductModal = (id) => {
+                const product = window.state.products.find(p => p.id === id);
+                if(!product) return;
+                window.state.activeProductId = id;
+
+                document.getElementById('pm-film').innerText = `${product.film || 'КАТАЛОГ'} / КОЛЛЕКЦИЯ`;
+                document.getElementById('pm-title').innerText = product.title || '';
+                document.getElementById('pm-price').innerText = `${product.price || 0} ₽`;
+                document.getElementById('pm-desc').innerText = product.desc || '';
+
+                currentProductMedia = [];
+                if(product.images && product.images.length > 0) product.images.forEach(img => currentProductMedia.push({ type: 'image', src: img }));
+                currentGalleryIndex = 0; window.renderGallery();
+
+                const sizesArr = (product.sizes || 'S,M,L,XL').split(',').map(s => s.trim());
+                document.getElementById('pm-sizes').innerHTML = sizesArr.map(s => `<button onclick="window.selectSize(this, '${s}')" class="size-btn w-12 h-12 border border-[#333] flex items-center justify-center text-sm font-bold hover:border-white transition-colors focus:outline-none bg-[#111]">${s}</button>`).join('');
+                
+                const btn = document.getElementById('pm-add-btn');
+                if(product.badge === 'SOLD OUT') {
+                    btn.innerText = 'НЕТ В НАЛИЧИИ'; btn.classList.add('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.remove('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = true;
+                } else {
+                    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.add('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = false;
+                }
+                document.getElementById('product-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.selectedSize = null;
+            }
+
+            window.renderGallery = () => {
+                if(currentProductMedia.length === 0) return;
+                const media = currentProductMedia[currentGalleryIndex];
+                document.getElementById('pm-main-media').innerHTML = `<img src="${media.src}" class="w-full h-full object-cover">`;
+                const thumbsContainer = document.getElementById('pm-thumbnails');
+                if(currentProductMedia.length > 1) {
+                    thumbsContainer.innerHTML = currentProductMedia.map((m, idx) => {
+                        const border = idx === currentGalleryIndex ? 'border-koshei-red' : 'border-[#333]';
+                        return `<div onclick="window.setGalleryIndex(${idx})" class="w-16 h-20 border-2 ${border} cursor-pointer opacity-80 hover:opacity-100 transition-all"><img src="${m.src}" class="w-full h-full object-cover"></div>`;
+                    }).join('');
+                } else { thumbsContainer.innerHTML = ''; }
+            }
+
+            window.setGalleryIndex = (idx) => { currentGalleryIndex = idx; window.renderGallery(); }
+            
+            window.selectSize = (btnElement, size) => {
+                document.querySelectorAll('.size-btn').forEach(b => { b.classList.remove('border-koshei-red', 'bg-koshei-red', 'text-white'); b.classList.add('border-[#333]', 'bg-[#111]', 'text-white'); });
+                btnElement.classList.remove('border-[#333]', 'bg-[#111]'); btnElement.classList.add('border-koshei-red', 'bg-koshei-red', 'text-white');
+                window.selectedSize = size;
+            }
+
+            window.addToCart = () => {
+                const product = window.state.products.find(p => p.id === window.state.activeProductId);
+                if(!product || product.badge === 'SOLD OUT') return;
+                const size = window.selectedSize || (product.sizes ? product.sizes.split(',')[0].trim() : 'M'); 
+                const existing = window.state.cart.find(item => item.id === product.id && item.size === size);
+                if(existing) existing.qty += 1;
+                else window.state.cart.push({ id: product.id, title: product.title, price: Number(product.price), size: size, qty: 1, img: product.images[0] });
+                renderCartUI(); window.showToast('ДОБАВЛЕНО В КОРЗИНУ'); window.closeProductModal();
+            }
+
+            window.removeFromCart = (idx) => { window.state.cart.splice(idx, 1); window.renderCartContents(); renderCartUI(); }
+
+            function renderCartUI() {
+                const totalQty = window.state.cart.reduce((sum, item) => sum + item.qty, 0);
+                const cartBadge = document.getElementById('header-cart-count');
+                const floatBtn = document.getElementById('floating-cart-btn');
+                const floatCnt = document.getElementById('floating-cart-count');
+
+                if(totalQty > 0) {
+                    if(cartBadge) { cartBadge.innerText = totalQty; cartBadge.classList.remove('hidden'); }
+                    if(floatBtn) floatBtn.classList.remove('hidden');
+                    if(floatCnt) floatCnt.innerText = totalQty;
+                } else {
+                    if(cartBadge) cartBadge.classList.add('hidden');
+                    if(floatBtn) floatBtn.classList.add('hidden');
+                }
+            }
+
+            window.applyPromo = () => {
+                const codeInput = document.getElementById('promo-input');
+                if(!codeInput) return;
+                const code = codeInput.value.trim().toUpperCase();
+
+                if (localStorage.getItem('used_promo_' + code)) {
+                    window.state.promoCode = ''; window.state.promoDiscount = 0;
+                    document.getElementById('promo-msg').innerHTML = `<span class="text-koshei-red">Вы уже использовали этот код!</span>`; window.renderCartContents(); return;
+                }
+
+                if(window.state.promos && window.state.promos[code]) {
+                    window.state.promoCode = code; window.state.promoDiscount = window.state.promos[code];
+                    document.getElementById('promo-msg').innerHTML = `<span class="text-green-500">Применен (-${window.state.promoDiscount*100}%)</span>`;
+                } else {
+                    window.state.promoCode = ''; window.state.promoDiscount = 0;
+                    document.getElementById('promo-msg').innerHTML = `<span class="text-koshei-red">Неверный код</span>`;
+                }
+                window.renderCartContents();
+            }
+
+            window.renderCartContents = () => {
+                const list = document.getElementById('cart-items');
+                const totalEl = document.getElementById('cart-total');
+                const checkoutBtn = document.getElementById('checkout-btn');
+
+                if(window.state.cart.length === 0) {
+                    list.innerHTML = '<div class="text-center py-10 tech-text text-[#666]">КОРЗИНА ПУСТА</div>';
+                    if(totalEl) totalEl.innerText = '0 ₽';
+                    if(checkoutBtn) checkoutBtn.classList.add('opacity-50', 'pointer-events-none');
+                    return;
+                }
+                if(checkoutBtn) checkoutBtn.classList.remove('opacity-50', 'pointer-events-none');
+
+                list.innerHTML = window.state.cart.map((item, idx) => `
+                    <div class="flex gap-4 items-center border-b border-[#222] pb-4 mb-4 last:border-0 bg-[#0A0A0A] p-3 relative">
+                        <img src="${item.img}" class="w-20 h-24 object-cover border border-[#333]">
+                        <div class="flex-grow pr-10">
+                            <div class="text-sm font-bold uppercase text-white leading-tight">${item.title}</div>
+                            <div class="tech-text text-[#888] mt-1">РАЗМЕР: ${item.size} | КОЛ-ВО: ${item.qty}</div>
+                            <div class="text-base font-bold text-koshei-red mt-1">${item.price * item.qty} ₽</div>
+                        </div>
+                        <button onclick="window.removeFromCart(${idx})" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#111] border border-[#333] text-[#666] hover:text-white hover:border-koshei-red hover:bg-koshei-red w-10 h-10 rounded-full flex items-center justify-center text-lg transition-colors focus:outline-none touch-manipulation shadow-md"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+
+                const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
+
+                let totalHtml = `СУММА: ${subtotal} ₽`;
+                if(window.state.promoDiscount > 0) totalHtml = `<span class="line-through text-[#666] mr-2">${subtotal} ₽</span> <span class="text-koshei-red">${finalTotal} ₽</span>`;
+                if(totalEl) totalEl.innerHTML = totalHtml;
+            }
+
+            window.checkoutCart = () => {
+                if(window.state.cart.length === 0) return;
+                const subtotal = window.state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
+                
+                let msg = `🔥 НОВЫЙ ЗАКАЗ 🔥\n\n`;
+                window.state.cart.forEach((item, i) => { msg += `${i+1}) ${item.title}\nРазмер: ${item.size} — ${item.qty} шт. x ${item.price}₽\n`; });
+                msg += `\nСумма: ${subtotal} ₽`;
+                
+                if(window.state.promoCode) { msg += `\nПромокод: ${window.state.promoCode} (-${window.state.promoDiscount*100}%)`; localStorage.setItem('used_promo_' + window.state.promoCode, 'true'); }
+                msg += `\nИТОГО К ОПЛАТЕ: ${finalTotal} ₽`;
+
+                const url = `https://t.me/${window.state.telegramUsername}?text=${encodeURIComponent(msg)}`;
+                const link = document.createElement('a'); link.href = url; link.target = '_blank'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                
+                window.state.cart = []; window.state.promoCode = ''; window.state.promoDiscount = 0; 
+                window.renderCartContents(); renderCartUI(); window.closeCart();
+            }
+
+            window.showToast = (msg) => {
+                const toast = document.getElementById('custom-toast'); const toastMsg = document.getElementById('toast-msg');
+                if(!toast || !toastMsg) return;
+                toastMsg.innerText = msg; toast.classList.remove('translate-y-[200%]', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-y-[200%]', 'opacity-0'), 3000);
+            }
+
+            loadCloudData();
         });
     </script>
 </body>
