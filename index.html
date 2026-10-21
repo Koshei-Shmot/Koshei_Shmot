@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Roboto Mono', monospace; background-color: #050505; color: #d1d5db; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto Mono', monospace; background-color: #050505; color: #d1d5db; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; }
         .dotted-box { border: 1px dashed #333; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #050505; }
@@ -34,7 +34,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .header-safe-zone { position: relative; z-index: 90 !important; }
         
-        /* Жесткий стиль для мобильных крестиков, чтобы они всегда нажимались */
         .close-btn-super {
             position: absolute;
             top: 16px;
@@ -58,9 +57,12 @@
             background-color: #E51A1A;
             border-color: #E51A1A;
         }
+
+        /* Пасхалка мод */
+        .easter-egg-mode { background-color: #3a0000 !important; }
     </style>
 </head>
-<body class="bg-koshei-dark text-gray-300 min-h-screen flex flex-col justify-between">
+<body class="bg-koshei-dark text-gray-300 min-h-screen flex flex-col justify-between" id="main-body">
 
     <div>
         <div class="border-b border-[#222] bg-[#050505] sticky top-0 header-safe-zone shadow-lg shadow-black/50">
@@ -70,8 +72,9 @@
             </div>
             
             <div class="px-4 py-4 md:py-6 flex justify-between items-center max-w-[1400px] mx-auto relative">
-                <div class="flex-shrink-0 z-50">
-                    <h1 class="font-impact text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.85] text-koshei-red tracking-tighter uppercase cursor-pointer" onclick="window.scrollTo(0,0)">KOSHEI<br>SHMOT</h1>
+                <div class="flex-shrink-0 z-50 select-none">
+                    <!-- СЕКРЕТНЫЙ ТРИГГЕР НА ЛОГОТИПЕ -->
+                    <h1 class="font-impact text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.85] text-koshei-red tracking-tighter uppercase cursor-pointer" onclick="window.triggerSecret()">KOSHEI<br>SHMOT</h1>
                 </div>
 
                 <div class="flex items-center gap-3 relative z-50">
@@ -174,10 +177,7 @@
     <div id="menu-modal" class="hidden fixed inset-0 z-[120] flex bg-black/95 backdrop-blur-md">
         <div class="w-full max-w-md mx-auto h-full bg-[#050505] border-l border-r border-[#222] flex flex-col p-8 relative overflow-y-auto no-scrollbar">
             
-            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
-            <button onclick="window.closeMenu()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeMenu()" class="close-btn-super"><i class="fas fa-times"></i></button>
             
             <div class="flex-grow pt-14">
                 <h2 class="font-impact text-3xl text-koshei-red uppercase mb-10 tracking-tight">KOSHEI MENU</h2>
@@ -185,11 +185,9 @@
                     <button onclick="window.openMusicModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>МУЗЫКА И КАССЕТЫ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
                     </button>
-                    <!-- НОВАЯ СТРОКА: ПЛЕЙЛИСТ -->
                     <button onclick="window.openPlaylistModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>ПЛЕЙЛИСТ</span> <i class="fas fa-play text-xs text-[#555]"></i>
                     </button>
-
                     <button onclick="window.openArchiveModal()" class="text-left font-impact text-2xl text-white hover:text-koshei-red uppercase transition-colors flex items-center justify-between cursor-pointer">
                         <span>АРХИВ / МАНИФЕСТ</span> <i class="fas fa-chevron-right text-xs text-[#555]"></i>
                     </button>
@@ -208,35 +206,23 @@
                     </a>
                 </div>
             </div>
-            
-            <!-- Секретная кнопка настроек -->
-            <div id="secret-keys-menu-btn-wrap" class="pt-8 mt-auto pb-4">
-                <button onclick="window.openSecretKeysModal()" class="w-full py-3 tech-text text-[#333] hover:text-[#555] transition-colors text-center cursor-pointer tracking-widest">[ НАСТРОЙКА СЕТИ ]</button>
-            </div>
         </div>
     </div>
 
-    <!-- СЕКРЕТНЫЕ НАСТРОЙКИ СЕТИ -->
+    <!-- СЕКРЕТНЫЕ НАСТРОЙКИ СЕТИ (Открываются только по секретному клику) -->
     <div id="secret-keys-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-koshei-red p-8 w-full max-w-md relative">
-            <button onclick="window.closeSecretKeysModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeSecretKeysModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="font-impact text-2xl text-white mb-2 uppercase pt-4">БАЗА ДАННЫХ</h3>
-            <p class="tech-text text-koshei-red mb-6">АВТОРИЗАЦИЯ ДОСТУПА</p>
+            <p class="tech-text text-koshei-red mb-6">СЕКРЕТНАЯ ПАНЕЛЬ</p>
             
-            <div id="pin-entry-box" class="space-y-4">
-                <input type="password" id="secret-pin-input" placeholder="Введите код доступа..." class="bg-[#111] border border-[#333] text-white p-4 w-full text-sm font-mono text-center tracking-widest">
-                <button onclick="window.checkSecretPin()" class="w-full bg-koshei-red text-white font-bold py-4 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ВОЙТИ</button>
-            </div>
-
-            <div id="keys-entry-box" class="hidden space-y-4">
+            <div id="keys-entry-box" class="space-y-4">
                 <div>
                     <label class="tech-text block mb-1 text-white">Bin ID</label>
                     <input type="text" id="settings-bin-id" class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs font-mono">
                 </div>
                 <div>
-                    <label class="tech-text block mb-1 text-white">Access / Master Key</label>
+                    <label class="tech-text block mb-1 text-white">Access Key</label>
                     <input type="text" id="settings-access-key" class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs font-mono">
                 </div>
                 <button onclick="window.saveSecretKeys()" class="w-full bg-green-600 text-white font-bold py-4 uppercase text-xs hover:bg-green-500 transition-colors cursor-pointer">СОХРАНИТЬ И ЗАКРЫТЬ</button>
@@ -248,10 +234,7 @@
     <div id="cart-modal" class="hidden fixed inset-0 z-[140] flex justify-end bg-black/80 backdrop-blur-sm">
         <div class="w-full md:w-[450px] h-full bg-[#050505] border-l border-[#333] shadow-2xl flex flex-col relative pt-16 md:pt-0">
             
-            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
-            <button onclick="window.closeCart()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeCart()" class="close-btn-super"><i class="fas fa-times"></i></button>
 
             <div class="p-6 border-b border-[#222] bg-[#050505]">
                 <h2 class="font-impact text-3xl uppercase text-white">ВАШ ЗАКАЗ</h2>
@@ -280,10 +263,7 @@
     <div id="product-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-0 md:p-8 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#0f0f0f] w-full h-full md:h-[85vh] max-w-6xl flex flex-col md:flex-row relative border border-[#222] shadow-2xl overflow-y-auto md:overflow-hidden pt-16 md:pt-0">
             
-            <!-- ОГРОМНЫЙ БЕЗОТКАЗНЫЙ КРЕСТИК -->
-            <button onclick="window.closeProductModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeProductModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             
             <div class="w-full md:w-1/2 h-[50vh] md:h-full bg-[#050505] border-b md:border-b-0 md:border-r border-[#222] flex flex-col relative">
                 <div id="pm-main-media" class="w-full flex-grow relative overflow-hidden bg-black flex items-center justify-center"></div>
@@ -308,26 +288,21 @@
         </div>
     </div>
 
-    <!-- Музыка -->
+    <!-- Остальные модалки (Музыка, Плейлист, Архив, Лукбук, Инфо) -->
     <div id="music-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
-            <button onclick="window.closeMusicModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeMusicModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">МУЗЫКА И АКУСТИКА ЭПОХИ</h3>
             <p class="tech-text text-koshei-red mb-6">ВИНИЛ, КАССЕТЫ И ПЛЕЕРЫ</p>
             <div class="space-y-6 text-sm text-[#ccc]">
                 <div>
-                    <h4 class="text-white font-bold uppercase text-xs mb-3 text-koshei-red tracking-wider">🎵 САУНДТРЕКИ КИНО (КАССЕТЫ И ВИНИЛ):</h4>
+                    <h4 class="text-white font-bold uppercase text-xs mb-3 text-koshei-red tracking-wider">🎵 САУНДТРЕКИ КИНО:</h4>
                     <div class="space-y-3">
                         <div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
-                            <div><div class="font-bold text-white uppercase text-xs">Nautilus Pompilius — Зверь</div><div class="tech-text text-[#777]">OST Брат (1997) • Кассета</div></div><i class="fas fa-compact-disc text-koshei-red text-xl animate-spin"></i>
+                            <div><div class="font-bold text-white uppercase text-xs">Nautilus Pompilius — Зверь</div><div class="tech-text text-[#777]">OST Брат (1997)</div></div><i class="fas fa-compact-disc text-koshei-red text-xl animate-spin"></i>
                         </div>
                         <div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
-                            <div><div class="font-bold text-white uppercase text-xs">Би-2 — Полковнику никто не пишет</div><div class="tech-text text-[#777]">OST Брат 2 (2000) • Винил</div></div><i class="fas fa-compact-disc text-koshei-red text-xl"></i>
-                        </div>
-                        <div class="bg-[#111] p-3 border border-[#222] flex justify-between items-center">
-                            <div><div class="font-bold text-white uppercase text-xs">Смысловые Галлюцинации — Вечно молодой</div><div class="tech-text text-[#777]">OST Брат 2 (2000) • Пленка</div></div><i class="fas fa-compact-disc text-koshei-red text-xl"></i>
+                            <div><div class="font-bold text-white uppercase text-xs">Би-2 — Полковнику никто не пишет</div><div class="tech-text text-[#777]">OST Брат 2 (2000)</div></div><i class="fas fa-compact-disc text-koshei-red text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -335,17 +310,13 @@
         </div>
     </div>
 
-    <!-- НОВЫЙ МОДАЛ: ПЛЕЙЛИСТ -->
     <div id="playlist-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
-            <button onclick="window.closePlaylistModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closePlaylistModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">ПЛЕЙЛИСТ KOSHEI</h3>
             <p class="tech-text text-koshei-red mb-6">САУНДТРЕК НАШИХ УЛИЦ</p>
             <div class="space-y-4 text-[#ccc] text-sm leading-relaxed">
-                <p>Здесь будет собран наш официальный плейлист с треками, которые вдохновляют нас на создание коллекций.</p>
-                <div class="border border-[#222] bg-[#0A0A0A] p-10 mt-6 text-center text-[#666] tech-text flex flex-col items-center gap-4">
+                <div class="border border-[#222] bg-[#0A0A0A] p-10 text-center text-[#666] tech-text flex flex-col items-center gap-4">
                     <i class="fas fa-headphones text-4xl text-[#333]"></i>
                     <span>В БУДУЩЕМ ЗДЕСЬ БУДЕТ ВСТРОЕННЫЙ ПЛЕЕР<br>(YANDEX MUSIC / VK / SPOTIFY)</span>
                 </div>
@@ -353,68 +324,77 @@
         </div>
     </div>
 
-    <!-- Архив -->
     <div id="archive-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[85vh] overflow-y-auto no-scrollbar pt-20">
-            <button onclick="window.closeArchiveModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeArchiveModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="font-impact text-3xl text-white mb-2 uppercase">МАНИФЕСТ И АРХИВ</h3>
             <p class="tech-text text-koshei-red mb-6">ПОЧЕМУ ДЕВЯНОСТЫЕ НЕ ОТПУСКАЮТ</p>
             <div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
-                <p><strong class="text-white">KOSHEI SHMOT</strong> — это не просто одежда. Это попытка зафиксировать время, которое оставило шрам на поколениях. Мы переносим эстетику улиц, старых кассет и культовых цитат на качественный хлопок.</p>
+                <p><strong class="text-white">KOSHEI SHMOT</strong> — это попытка зафиксировать время, которое оставило шрам на поколениях. Мы переносим эстетику улиц, старых кассет и культовых цитат на качественный хлопок.</p>
                 <blockquote class="border-l-2 border-koshei-red pl-4 text-white italic my-4">«В чём сила, брат? А я вот думаю, что сила в правде.»</blockquote>
             </div>
         </div>
     </div>
 
-    <!-- О проекте и доставке -->
+    <!-- FAQ добавлен сюда -->
     <div id="info-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20">
-            <button onclick="window.closeInfoModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeInfoModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="text-white font-impact text-3xl mb-6 uppercase">О ПРОЕКТЕ И ДОСТАВКЕ</h3>
             <div class="space-y-4 text-sm text-[#ccc] leading-relaxed">
-                <p><strong class="text-white">KOSHEI SHMOT</strong> — независимый бренд из <strong class="text-white">Калининграда</strong>. Мы создаем вещи, пропитанные духом отечественного кинематографа 90-х и нулевых («Брат», «Бумер», «Жмурки», «Сёстры»).</p>
+                <p><strong class="text-white">KOSHEI SHMOT</strong> — независимый бренд из <strong class="text-white">Калининграда</strong>. Мы создаем вещи, пропитанные духом отечественного кинематографа 90-х и нулевых.</p>
+                
                 <div class="border-t border-[#222] pt-4 mt-4">
                     <h4 class="text-white font-bold uppercase mb-3 text-xs text-koshei-red tracking-wider">📦 ДОСТАВКА И ЗАКАЗ:</h4>
                     <ul class="list-disc pl-5 space-y-3 text-[#aaa]">
-                        <li><strong class="text-white">Как сделать заказ:</strong> Добавьте вещи в корзину и нажмите «Оформить в Telegram». Заказ перенесется в наш чат поддержки.</li>
-                        <li><strong class="text-white">Откуда отправка:</strong> Все заказы отправляются напрямую из <strong class="text-white">Калининграда</strong>.</li>
-                        <li><strong class="text-white">Способы доставки:</strong> Почта России или СДЭК в любой регион. Трек-номер выдается сразу.</li>
-                        <li><strong class="text-white">Оплата:</strong> Детали и способ оплаты согласовываются с менеджером в Telegram при подтверждении заказа.</li>
+                        <li><strong class="text-white">Способы доставки:</strong> Почта России или СДЭК в любой регион.</li>
+                        <li><strong class="text-white">Оплата:</strong> Детали и способ оплаты согласовываются с менеджером в Telegram.</li>
                     </ul>
                 </div>
+
+                <!-- БЛОК FAQ (АККОРДЕОН) -->
+                <div class="border-t border-[#222] pt-4 mt-4">
+                    <h4 class="text-white font-bold uppercase mb-3 text-xs text-koshei-red tracking-wider">❓ ЧАСТЫЕ ВОПРОСЫ (FAQ)</h4>
+                    <div class="space-y-2">
+                        <div class="border border-[#222] bg-[#0A0A0A]">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full text-left p-3 text-white text-xs uppercase font-bold flex justify-between focus:outline-none">Как стирать вещи? <i class="fas fa-chevron-down text-[#666]"></i></button>
+                            <div class="hidden p-3 pt-0 text-[#888] text-xs">Бережная стирка при 30 градусах, вывернув наизнанку. Не гладить напрямую по принту, только с обратной стороны.</div>
+                        </div>
+                        <div class="border border-[#222] bg-[#0A0A0A]">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full text-left p-3 text-white text-xs uppercase font-bold flex justify-between focus:outline-none">Условия возврата? <i class="fas fa-chevron-down text-[#666]"></i></button>
+                            <div class="hidden p-3 pt-0 text-[#888] text-xs">Возврат возможен в течение 14 дней, если вещь не носили и сохранены все бирки. Напишите нам в поддержку.</div>
+                        </div>
+                        <div class="border border-[#222] bg-[#0A0A0A]">
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full text-left p-3 text-white text-xs uppercase font-bold flex justify-between focus:outline-none">Качество и ткань? <i class="fas fa-chevron-down text-[#666]"></i></button>
+                            <div class="hidden p-3 pt-0 text-[#888] text-xs">Мы используем плотный 100% хлопок премиум качества. Ткань отлично дышит и держит форму после стирок.</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Галерея лукбука -->
+    <!-- Лукбук с пагинацией -->
     <div id="looks-gallery-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
-        <div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20">
-            <button onclick="window.closeLooksGalleryModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
-            <h3 class="font-impact text-3xl text-white mb-2 uppercase">УЛИЧНАЯ ХРОНИКА / ЛУКБУК</h3>
-            <p class="tech-text text-koshei-red mb-6">ФОТО И ЦИТАТЫ НАШИХ ЛЮДЕЙ</p>
-            <div id="looks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div class="bg-[#050505] border border-[#333] p-6 md:p-8 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto no-scrollbar pt-20 flex flex-col">
+            <button onclick="window.closeLooksGalleryModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
+            <h3 class="font-impact text-3xl text-white mb-2 uppercase">УЛИЧНАЯ ХРОНИКА</h3>
+            <p class="tech-text text-koshei-red mb-6">ЛУКБУК ОТ НАШИХ ЛЮДЕЙ</p>
+            <div id="looks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"></div>
+            <button id="load-more-looks-btn" onclick="window.loadMoreLooks()" class="hidden w-full bg-[#111] border border-[#333] text-white font-bold py-4 uppercase text-xs hover:bg-[#222] transition-colors cursor-pointer mt-auto">ЗАГРУЗИТЬ ЕЩЕ ФОТО</button>
         </div>
     </div>
 
-    <!-- Добавить лук -->
     <div id="look-submit-modal" class="hidden fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
         <div class="bg-[#050505] border border-[#333] p-8 w-full max-w-md relative pt-20">
-            <button onclick="window.closeLookModal()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeLookModal()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="font-impact text-2xl text-white mb-2 uppercase">ДОБАВИТЬ В ЛУКБУК</h3>
-            <p class="tech-text text-koshei-red mb-6">ФОТО ПРОЙДЕТ ПРОВЕРКУ АДМИНИСТРАТОРОМ</p>
             <form id="look-form" onsubmit="window.submitLook(event)" class="space-y-4">
-                <div><label class="tech-text block mb-1 text-white">Прямая ссылка на фото</label><input type="url" id="look-img" placeholder="https://..." required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
-                <div><label class="tech-text block mb-1 text-white">Ваша цитата</label><input type="text" id="look-msg" placeholder="Не мы такие — жизнь такая" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
-                <div><label class="tech-text block mb-1 text-white">Имя / Город</label><input type="text" id="look-author" placeholder="Макс, Калининград" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
-                <button type="submit" class="w-full bg-koshei-red text-white font-bold py-4 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ОТПРАВИТЬ НА МОДЕРАЦИЮ</button>
+                <div><label class="tech-text block mb-1 text-white">Прямая ссылка на фото</label><input type="url" id="look-img" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+                <div><label class="tech-text block mb-1 text-white">Ваша цитата</label><input type="text" id="look-msg" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+                <div><label class="tech-text block mb-1 text-white">Имя / Город</label><input type="text" id="look-author" required class="bg-[#111] border border-[#333] text-white p-3 w-full text-xs"></div>
+                <button type="submit" class="w-full bg-koshei-red text-white font-bold py-4 uppercase text-xs hover:bg-red-700 transition-colors cursor-pointer">ОТПРАВИТЬ</button>
             </form>
         </div>
     </div>
@@ -422,9 +402,7 @@
     <!-- Сетка размеров -->
     <div id="size-guide-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/90">
         <div class="bg-[#050505] border border-[#333] p-6 w-full max-w-md relative pt-20">
-            <button onclick="window.closeSizeGuide()" class="close-btn-super">
-                <i class="fas fa-times"></i>
-            </button>
+            <button onclick="window.closeSizeGuide()" class="close-btn-super"><i class="fas fa-times"></i></button>
             <h3 class="text-white font-impact text-xl mb-4 text-center uppercase">СЕТКА РАЗМЕРОВ</h3>
             <table class="w-full text-xs text-left border border-[#333] text-[#ccc]">
                 <tr class="bg-[#111]"><th class="border border-[#333] p-2">Размер</th><th class="border border-[#333] p-2">Грудь (см)</th><th class="border border-[#333] p-2">Длина (см)</th></tr>
@@ -437,20 +415,19 @@
     </div>
 
     <!-- Всплывающее уведомление -->
-    <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[300] bg-white text-black font-bold uppercase text-[12px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl pointer-events-none rounded-full">
-        <i class="fas fa-check"></i> <span id="toast-msg">ДОБАВЛЕНО</span>
+    <div id="custom-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-[200%] opacity-0 z-[300] bg-white text-black font-bold uppercase text-[12px] py-3 px-6 transition-all duration-300 flex items-center gap-2 shadow-2xl pointer-events-none rounded-full whitespace-nowrap">
+        <i class="fas fa-info-circle text-koshei-red"></i> <span id="toast-msg">УВЕДОМЛЕНИЕ</span>
     </div>
 
     <!-- ГЛАВНЫЙ СКРИПТ -->
     <script>
-        // Инициализация базы данных и ключей по умолчанию
         let JSONBIN_BIN_ID = localStorage.getItem('koshei_main_bin_id') || "6ad4d653ac6210605a3c4912";
         let JSONBIN_ACCESS_KEY = localStorage.getItem('koshei_main_access_key') || "$2a$10$HHmF6ZgWCnPVqG9Ggxp/EOBYkZiG5pocHmYToVmlv/I66cdgwqaQy";
 
         window.state = {
-            products: [], films: [], looks: [], pendingLooks: [], cart: [],
+            products: [], films: [], looks: [], pendingLooks: [], cart: [], promos: {},
             promoCode: '', promoDiscount: 0, telegramUsername: "KOSHEI_SUPPORT", 
-            searchQuery: "", currentFilmSlide: 0, activeProductId: null, promos: {}
+            searchQuery: "", currentFilmSlide: 0, activeProductId: null, looksLimit: 6
         };
 
         let filmInterval = null;
@@ -465,14 +442,13 @@
         window.openMusicModal = () => { window.closeMenu(); document.getElementById('music-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
         window.closeMusicModal = () => { document.getElementById('music-modal').classList.add('hidden'); document.body.style.overflow = ''; };
 
-        // НОВЫЙ МОДАЛ: ПЛЕЙЛИСТ
         window.openPlaylistModal = () => { window.closeMenu(); document.getElementById('playlist-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
         window.closePlaylistModal = () => { document.getElementById('playlist-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
         window.openArchiveModal = () => { window.closeMenu(); document.getElementById('archive-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
         window.closeArchiveModal = () => { document.getElementById('archive-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
-        window.openLooksGalleryModal = () => { window.closeMenu(); document.getElementById('looks-gallery-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.renderLooks(); };
+        window.openLooksGalleryModal = () => { window.closeMenu(); document.getElementById('looks-gallery-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.state.looksLimit = 6; window.renderLooks(); };
         window.closeLooksGalleryModal = () => { document.getElementById('looks-gallery-modal').classList.add('hidden'); document.body.style.overflow = ''; };
         
         window.openLookModal = () => { window.closeMenu(); document.getElementById('look-submit-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
@@ -483,8 +459,36 @@
         
         window.openSizeGuide = () => { document.getElementById('size-guide-modal').classList.remove('hidden'); };
         window.closeSizeGuide = () => { document.getElementById('size-guide-modal').classList.add('hidden'); };
-        
         window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden'); document.body.style.overflow = ''; window.state.activeProductId = null; };
+
+        // СЕКРЕТНЫЙ ТРИГГЕР НАСТРОЕК (5 КЛИКОВ ПО ЛОГО)
+        let secretClickCount = 0;
+        let secretClickTimer = null;
+        window.triggerSecret = () => {
+            secretClickCount++;
+            clearTimeout(secretClickTimer);
+            if(secretClickCount >= 5) {
+                secretClickCount = 0;
+                document.getElementById('settings-bin-id').value = JSONBIN_BIN_ID;
+                document.getElementById('settings-access-key').value = JSONBIN_ACCESS_KEY;
+                document.getElementById('secret-keys-modal').classList.remove('hidden');
+            }
+            secretClickTimer = setTimeout(() => { secretClickCount = 0; }, 2000);
+        };
+        window.closeSecretKeysModal = () => { document.getElementById('secret-keys-modal').classList.add('hidden'); };
+
+        window.saveSecretKeys = () => {
+            const bId = document.getElementById('settings-bin-id').value.trim();
+            const aKey = document.getElementById('settings-access-key').value.trim();
+            if(bId && aKey) {
+                localStorage.setItem('koshei_main_bin_id', bId);
+                localStorage.setItem('koshei_main_access_key', aKey);
+                JSONBIN_BIN_ID = bId; JSONBIN_ACCESS_KEY = aKey;
+                alert("Ключи сохранены! База подключена.");
+                window.closeSecretKeysModal();
+                loadCloudData();
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             function getDefaultFilms() {
@@ -492,52 +496,6 @@
                     { id: 'bumer', tag: 'BMR', title: 'БУМЕР', desc: 'Чёрный BMW, ночная трасса, свобода.', quote: '«Не мы такие — жизнь такая.»', author: 'ПЁТР БУСЛОВ — 2003', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BUMER&font=Oswald' },
                     { id: 'brat', tag: 'BRT', title: 'БРАТ', desc: 'Питер, дожди, кассета Nautilus.', quote: '«В чём сила, брат?»', author: 'АЛЕКСЕЙ БАЛАБАНОВ — 1997', img: 'https://placehold.co/1200x600/050505/E51A1A?text=BRAT&font=Oswald' }
                 ];
-            }
-
-            window.checkSecretPin = () => {
-                const val = document.getElementById('secret-pin-input').value.trim();
-                if(val === '9812') {
-                    document.getElementById('pin-entry-box').classList.add('hidden');
-                    document.getElementById('keys-entry-box').classList.remove('hidden');
-                    document.getElementById('settings-bin-id').value = JSONBIN_BIN_ID;
-                    document.getElementById('settings-access-key').value = JSONBIN_ACCESS_KEY;
-                } else {
-                    alert("Неверный код!");
-                }
-            };
-
-            window.saveSecretKeys = () => {
-                const bId = document.getElementById('settings-bin-id').value.trim();
-                const aKey = document.getElementById('settings-access-key').value.trim();
-                if(bId && aKey) {
-                    localStorage.setItem('koshei_main_bin_id', bId);
-                    localStorage.setItem('koshei_main_access_key', aKey);
-                    localStorage.setItem('koshei_keys_configured', 'true');
-                    JSONBIN_BIN_ID = bId; JSONBIN_ACCESS_KEY = aKey;
-                    alert("Ключи сохранены! База подключена.");
-                    window.closeSecretKeysModal();
-                    checkKeysConfiguredState();
-                    loadCloudData();
-                }
-            };
-
-            window.openSecretKeysModal = () => {
-                window.closeMenu();
-                document.getElementById('secret-keys-modal').classList.remove('hidden'); 
-                document.body.style.overflow = 'hidden';
-                document.getElementById('pin-entry-box').classList.remove('hidden');
-                document.getElementById('keys-entry-box').classList.add('hidden');
-                document.getElementById('secret-pin-input').value = '';
-            };
-
-            window.closeSecretKeysModal = () => {
-                document.getElementById('secret-keys-modal').classList.add('hidden'); document.body.style.overflow = '';
-            };
-
-            function checkKeysConfiguredState() {
-                const configured = localStorage.getItem('koshei_keys_configured');
-                const wrap = document.getElementById('secret-keys-menu-btn-wrap');
-                if (configured === 'true' && wrap) { wrap.style.display = 'none'; } 
             }
 
             async function loadCloudData() {
@@ -555,25 +513,30 @@
                         window.state.promos = data.promos || {};
                         window.state.looks = data.looks || [];
                         window.state.pendingLooks = data.pendingLooks || [];
-                    } else {
-                        window.state.films = getDefaultFilms();
-                    }
-                } catch(e) {
-                    window.state.films = getDefaultFilms();
-                }
+                    } else { window.state.films = getDefaultFilms(); }
+                } catch(e) { window.state.films = getDefaultFilms(); }
                 renderAll();
             }
 
             function renderAll() { 
-                renderProducts();
-                renderFilmSlide();
-                renderCartUI();
-                setupSwipeListeners();
-                resetAutoPlay();
-                checkKeysConfiguredState();
+                renderProducts(); renderFilmSlide(); renderCartUI(); setupSwipeListeners(); resetAutoPlay();
             }
 
-            window.handleSearch = (e) => { window.state.searchQuery = (e.target.value || '').toLowerCase(); renderProducts(); }
+            // ПАСХАЛКА В ПОИСКЕ
+            window.handleSearch = (e) => { 
+                const q = (e.target.value || '').toLowerCase().trim();
+                window.state.searchQuery = q; 
+                
+                if(q === 'сила' || q === 'данила') {
+                    document.getElementById('main-body').classList.add('easter-egg-mode');
+                    window.showToast("ПАСХАЛКА: СИЛА В ПРАВДЕ! СКИДКА НАЙДЕНА.");
+                    // Вкидываем фейковый промокод для атмосферы (если захотите, добавите его в админке)
+                    setTimeout(() => { document.getElementById('main-body').classList.remove('easter-egg-mode'); }, 4000);
+                }
+                
+                renderProducts(); 
+            }
+
             window.nextFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide + 1) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
             window.prevFilm = () => { if(!window.state.films || window.state.films.length === 0) return; window.state.currentFilmSlide = (window.state.currentFilmSlide - 1 + window.state.films.length) % window.state.films.length; renderFilmSlide(); resetAutoPlay(); }
 
@@ -640,6 +603,7 @@
                     let badgeHtml = '';
                     if(p.badge === 'NEW') badgeHtml = `<div class="absolute top-3 right-3 bg-white text-black text-[12px] font-bold px-3 py-1 z-20 shadow-md">НОВИНКА</div>`;
                     else if(p.badge === 'SOLD OUT') badgeHtml = `<div class="absolute top-3 right-3 bg-koshei-red text-white text-[12px] font-bold px-3 py-1 z-20 shadow-md">SOLD OUT</div>`;
+                    else if(p.badge === 'PREORDER') badgeHtml = `<div class="absolute top-3 right-3 bg-yellow-500 text-black text-[12px] font-bold px-3 py-1 z-20 shadow-md uppercase tracking-wider">ПРЕДЗАКАЗ</div>`;
 
                     const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://placehold.co/800x1000/0A0A0A/E51A1A?text=NO+IMAGE';
                     return `
@@ -661,19 +625,38 @@
                 }).join('');
             }
 
+            // ПАГИНАЦИЯ ЛУКБУКА
             window.renderLooks = () => {
                 const grid = document.getElementById('looks-grid');
+                const loadMoreBtn = document.getElementById('load-more-looks-btn');
+                
                 if(!window.state.looks || window.state.looks.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-8 tech-text text-[#666]">ПОКА НЕТ ФОТО В ЛУКБУКЕ. БУДЬ ПЕРВЫМ!</div>'; return;
+                    grid.innerHTML = '<div class="col-span-full text-center py-8 tech-text text-[#666]">ПОКА НЕТ ФОТО В ЛУКБУКЕ. БУДЬ ПЕРВЫМ!</div>'; 
+                    loadMoreBtn.classList.add('hidden');
+                    return;
                 }
-                grid.innerHTML = window.state.looks.map(l => `
-                    <div class="bg-[#0A0A0A] border border-[#222] overflow-hidden flex flex-col">
+
+                const visibleLooks = window.state.looks.slice(0, window.state.looksLimit);
+                
+                grid.innerHTML = visibleLooks.map(l => `
+                    <div class="bg-[#0A0A0A] border border-[#222] overflow-hidden flex flex-col fade-in">
                         <div class="aspect-[4/5] bg-black overflow-hidden relative"><img src="${l.img}" class="w-full h-full object-cover"></div>
                         <div class="p-4 flex flex-col justify-between flex-grow">
                             <p class="text-sm text-white mb-3 italic">«${l.msg || ''}»</p>
                             <div class="tech-text text-koshei-red">— ${l.author || 'СВОЙ'}</div>
                         </div>
                     </div>`).join('');
+                
+                if(window.state.looks.length > window.state.looksLimit) {
+                    loadMoreBtn.classList.remove('hidden');
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
+            }
+
+            window.loadMoreLooks = () => {
+                window.state.looksLimit += 6;
+                window.renderLooks();
             }
 
             window.submitLook = async (e) => {
@@ -685,7 +668,6 @@
                 const msg = document.getElementById('look-msg').value.trim();
                 const author = document.getElementById('look-author').value.trim() || 'Аноним';
 
-                if(!img || !msg) { alert("Заполните ссылку на фото и сообщение!"); btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false; return; }
                 const newLook = { id: Date.now(), img, msg, author };
                 
                 try {
@@ -706,13 +688,13 @@
                         });
 
                         if(putRes.ok) {
-                            alert("Фото успешно отправлено на проверку!");
+                            window.showToast("ФОТО ОТПРАВЛЕНО НА ПРОВЕРКУ!");
                             document.getElementById('look-form').reset();
                             window.closeLookModal();
-                        } else { alert("Ошибка базы данных при отправке."); }
+                        } else { alert("Ошибка базы данных."); }
                     }
                 } catch(err) { alert("Ошибка сети."); }
-                btn.innerText = "ОТПРАВИТЬ НА МОДЕРАЦИЮ"; btn.disabled = false;
+                btn.innerText = "ОТПРАВИТЬ"; btn.disabled = false;
             }
 
             let currentGalleryIndex = 0; let currentProductMedia = [];
@@ -737,8 +719,10 @@
                 const btn = document.getElementById('pm-add-btn');
                 if(product.badge === 'SOLD OUT') {
                     btn.innerText = 'НЕТ В НАЛИЧИИ'; btn.classList.add('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.remove('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = true;
+                } else if(product.badge === 'PREORDER') {
+                    btn.innerHTML = '<i class="fas fa-box-open"></i> ОФОРМИТЬ ПРЕДЗАКАЗ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed', 'bg-koshei-red', 'hover:bg-red-700'); btn.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'text-black'); btn.disabled = false;
                 } else {
-                    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed'); btn.classList.add('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ДОБАВИТЬ В КОРЗИНУ'; btn.classList.remove('bg-[#333]', 'text-[#888]', 'cursor-not-allowed', 'bg-yellow-500', 'hover:bg-yellow-600', 'text-black'); btn.classList.add('bg-koshei-red', 'hover:bg-red-700', 'text-white'); btn.disabled = false;
                 }
                 document.getElementById('product-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; window.selectedSize = null;
             }
@@ -770,8 +754,8 @@
                 const size = window.selectedSize || (product.sizes ? product.sizes.split(',')[0].trim() : 'M'); 
                 const existing = window.state.cart.find(item => item.id === product.id && item.size === size);
                 if(existing) existing.qty += 1;
-                else window.state.cart.push({ id: product.id, title: product.title, price: Number(product.price), size: size, qty: 1, img: product.images[0] });
-                renderCartUI(); window.showToast('ДОБАВЛЕНО В КОРЗИНУ'); window.closeProductModal();
+                else window.state.cart.push({ id: product.id, title: product.title, price: Number(product.price), size: size, qty: 1, img: product.images[0], isPreorder: product.badge === 'PREORDER' });
+                renderCartUI(); window.showToast('УСПЕШНО ДОБАВЛЕНО'); window.closeProductModal();
             }
 
             window.removeFromCart = (idx) => { window.state.cart.splice(idx, 1); window.renderCartContents(); renderCartUI(); }
@@ -829,7 +813,7 @@
                     <div class="flex gap-4 items-center border-b border-[#222] pb-4 mb-4 last:border-0 bg-[#0A0A0A] p-3 relative">
                         <img src="${item.img}" class="w-20 h-24 object-cover border border-[#333]">
                         <div class="flex-grow pr-10">
-                            <div class="text-sm font-bold uppercase text-white leading-tight">${item.title}</div>
+                            <div class="text-sm font-bold uppercase text-white leading-tight">${item.title} ${item.isPreorder ? '<span class="text-yellow-500 text-[10px]">[ПРЕДЗАКАЗ]</span>' : ''}</div>
                             <div class="tech-text text-[#888] mt-1">РАЗМЕР: ${item.size} | КОЛ-ВО: ${item.qty}</div>
                             <div class="text-base font-bold text-koshei-red mt-1">${item.price * item.qty} ₽</div>
                         </div>
@@ -851,7 +835,10 @@
                 const finalTotal = subtotal - (subtotal * window.state.promoDiscount);
                 
                 let msg = `🔥 НОВЫЙ ЗАКАЗ 🔥\n\n`;
-                window.state.cart.forEach((item, i) => { msg += `${i+1}) ${item.title}\nРазмер: ${item.size} — ${item.qty} шт. x ${item.price}₽\n`; });
+                window.state.cart.forEach((item, i) => { 
+                    const preorderTag = item.isPreorder ? ' [ПРЕДЗАКАЗ]' : '';
+                    msg += `${i+1}) ${item.title}${preorderTag}\nРазмер: ${item.size} — ${item.qty} шт. x ${item.price}₽\n`; 
+                });
                 msg += `\nСумма: ${subtotal} ₽`;
                 
                 if(window.state.promoCode) { msg += `\nПромокод: ${window.state.promoCode} (-${window.state.promoDiscount*100}%)`; localStorage.setItem('used_promo_' + window.state.promoCode, 'true'); }
